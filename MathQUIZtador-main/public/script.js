@@ -1,14 +1,14 @@
-const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? ''
-  : 'https://mathquiz-backend-uakf.onrender.com';
+// Same-origin: frontend-ul vorbește cu ACELAȘI server care îl servește.
+// Serverul (server.js) trebuie să ruleze ca proces persistent (local sau Render
+// Web Service), NU pe Vercel serverless — serverless nu suportă WebSocket.
+const BACKEND_URL = '';
 
 const _storedToken = localStorage.getItem('socketToken');
 const socket = io(BACKEND_URL, {
   withCredentials: true,
   auth: _storedToken ? { token: _storedToken } : {},
-  // WebSocket direct — evită upgrade-ul instabil polling->ws care cauza deconectări
-  transports: ['websocket'],
-  upgrade: false,
+  // Permite și polling ca rezervă, dar preferă websocket
+  transports: ['websocket', 'polling'],
   // Reconectare robustă — un blip de rețea nu te scoate din joc
   reconnection: true,
   reconnectionAttempts: Infinity,
@@ -525,8 +525,18 @@ if (isGamePage) {
 
     const pathEls = []; // for label placement after DOM insertion
 
+    // Aliasuri pentru abrevieri vechi/variante (ex: backend mai vechi trimitea "MJ" pentru Mehedinți)
+    const ABBR_ALIAS = { mj: 'mh', buc: 'b', b: 'b' };
+
     map.forEach(node => {
-      const d = REAL_PATHS['ro-' + node.abbr.toLowerCase()];
+      let key = (node.abbr || '').toLowerCase();
+      let d = REAL_PATHS['ro-' + key];
+      if (!d && ABBR_ALIAS[key]) d = REAL_PATHS['ro-' + ABBR_ALIAS[key]];
+      // ultim resort: caută după nume (Mehedinți etc.)
+      if (!d && node.name && window.ROMANIA_MAP) {
+        const byName = window.ROMANIA_MAP.locations.find(l => l.name && l.name.toLowerCase() === node.name.toLowerCase());
+        if (byName) d = byName.path;
+      }
       if (!d) return;
       const isOwnedByMe  = node.owner === socket.id;
       const isAttackable = attackableIds.has(node.id);

@@ -14,6 +14,8 @@ const socketTokens = new Map();
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
+  pingInterval: 25000,
+  pingTimeout: 20000,
   cors: {
     origin: true,
     methods: ["GET", "POST"],
@@ -249,7 +251,7 @@ const territoriesList = [
   { id: 24, name: "Iași",              abbr: "IS", x: 752, y: 173 },
   { id: 25, name: "Ilfov",             abbr: "IF", x: 650, y: 448 },
   { id: 26, name: "Maramureș",         abbr: "MM", x: 400, y: 118 },
-  { id: 27, name: "Mehedinți",         abbr: "MJ", x: 298, y: 462 },
+  { id: 27, name: "Mehedinți",         abbr: "MH", x: 298, y: 462 },
   { id: 28, name: "Mureș",             abbr: "MS", x: 475, y: 250 },
   { id: 29, name: "Neamț",             abbr: "NT", x: 628, y: 206 },
   { id: 30, name: "Olt",               abbr: "OT", x: 450, y: 478 },
@@ -749,20 +751,31 @@ io.on('connection', (socket) => {
           });
         }
       } else if (room.status === 'playing' || room.status === 'selecting') {
-        // Give player 10 seconds to reconnect (page navigation to game.html)
+        // Give player up to 60 seconds to reconnect
         const player = room.players.find(p => p.socketId === socket.id);
         if (player) {
+          console.log(`Player ${player.username} disconnected from room ${roomCode}. Waiting 60s for rejoin.`);
           player.disconnected = true;
+          
+          // Clear any existing timer just in case
+          if (player.reconnectTimer) clearTimeout(player.reconnectTimer);
+          
           player.reconnectTimer = setTimeout(() => {
             if (player.disconnected && rooms[roomCode]) {
+              console.log(`Player ${player.username} failed to reconnect within 60s. Removing from room.`);
               room.players = room.players.filter(p => p.socketId !== player.socketId);
+              
+              // Notify others
               io.to(room.code).emit('player-disconnected', { username: player.username });
+              
+              // End game only if no one else is connected
               const stillConnected = room.players.filter(p => !p.disconnected);
-              if (stillConnected.length <= 1) {
+              if (stillConnected.length <= (room.mode === '1v1' ? 0 : 1)) {
+                console.log(`Not enough players left in room ${roomCode}. Finishing game.`);
                 endGameDueToDisconnect(room);
               }
             }
-          }, 10000);
+          }, 60000);
         }
       }
     }

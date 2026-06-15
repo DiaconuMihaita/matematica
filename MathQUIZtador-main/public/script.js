@@ -1,117 +1,97 @@
-// Detect if running locally or on hosted production backend (e.g. Render)
-const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? '' // Local development (relative paths)
-  : 'https://mathquiz-backend-uakf.onrender.com'; // Replace with deployed Render backend URL
+﻿const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? ''
+  : 'https://mathquiz-backend-uakf.onrender.com';
 
-// Poligoane SVG pentru fiecare județ (viewBox 0 0 920 580)
-const countyPolygons = {
-  1:  "370,232 402,222 430,240 450,265 448,306 428,328 400,335 370,328 346,314 336,294 346,265",
-  2:  "65,193 145,186 165,196 175,220 172,270 150,293 126,306 93,300 68,283 53,260 58,226",
-  3:  "430,344 496,334 526,348 540,375 536,418 516,444 490,455 460,455 430,442 410,419 406,385",
-  4:  "566,164 665,154 688,174 692,215 680,250 655,270 630,280 603,280 576,266 556,246 550,215 553,182",
-  5:  "145,93 288,88 308,112 305,162 282,190 250,202 215,200 175,196 148,180 138,154 136,120",
-  6:  "385,84 475,80 494,106 490,155 468,175 440,180 410,172 383,155 356,130 352,106",
-  7:  "692,12 768,12 786,56 770,110 745,126 716,128 690,118 668,142 694,106 710,56",
-  8:  "696,348 760,335 783,352 786,388 778,419 758,435 733,440 706,429 693,408 690,378",
-  9:  "460,312 540,302 570,318 590,344 586,375 570,394 543,404 516,405 490,392 466,372 453,345",
-  10: "580,305 655,296 686,312 706,338 702,378 685,398 658,411 630,408 603,394 585,372 576,345",
-  11: "603,468 660,460 696,466 728,480 730,510 712,536 686,545 655,542 623,530 606,507 598,482",
-  12: "65,335 148,328 178,340 196,362 192,406 175,430 150,442 112,442 80,430 60,406 56,373",
-  13: "260,110 402,104 425,126 425,186 405,215 378,229 348,236 318,225 290,212 268,196 250,166 258,136",
-  14: "750,436 800,446 830,452 860,443 890,421 906,400 913,456 908,515 890,555 866,576 836,580 804,576 773,566 750,546 740,516",
-  15: "532,266 596,258 624,278 630,312 618,340 598,354 575,360 552,353 530,338 522,312",
-  16: "463,372 536,360 562,375 566,408 553,434 528,448 503,452 476,442 456,428 448,406",
-  17: "233,458 323,452 355,462 373,488 366,526 343,550 306,556 266,550 230,530 216,508 220,480",
-  18: "716,318 790,308 820,325 836,358 830,390 808,404 778,408 750,398 724,382 712,355",
-  19: "480,460 520,450 546,458 558,480 555,514 535,535 510,546 480,543 450,528 446,506 453,478",
-  20: "253,366 336,358 362,370 375,394 370,425 350,445 323,455 293,455 263,445 242,424 240,398",
-  21: "490,158 560,150 576,176 580,210 570,248 556,280 540,306 523,326 508,332 490,322 476,302 473,265 482,230 486,196",
-  22: "222,260 336,252 366,268 380,298 378,334 360,354 336,362 306,358 276,344 246,324 226,305 216,282",
-  23: "600,414 660,408 695,418 725,435 730,462 715,489 696,508 666,512 636,506 610,489 598,466",
-  24: "668,142 770,124 788,146 784,190 764,212 736,222 708,225 682,215 662,196 665,176",
-  25: "543,435 576,425 610,428 622,448 619,468 608,485 586,488 560,488 540,476 533,456",
-  26: "305,15 472,12 490,44 476,70 458,88 420,98 385,96 338,93 322,78 322,44",
-  27: "166,442 250,432 270,448 276,475 263,502 240,518 213,526 183,520 163,505 156,478",
-  28: "376,172 458,160 494,176 512,200 510,235 490,260 466,272 440,275 413,266 386,246 370,222 368,196",
-  29: "552,130 645,120 668,142 665,176 645,196 620,208 593,208 566,196 546,174 540,148",
-  30: "380,445 418,438 453,446 466,468 463,504 446,528 420,540 390,540 360,526 350,505 356,472",
-  31: "500,345 562,335 590,348 600,374 596,408 576,428 550,440 523,442 500,428 480,408 470,382",
-  32: "250,88 385,84 402,110 398,146 376,166 346,172 315,170 283,156 260,136 246,112",
-  33: "192,15 305,15 322,44 310,78 288,92 252,90 210,86 192,60 190,35",
-  34: "320,302 400,294 432,308 448,334 446,365 426,382 400,388 370,386 344,372 320,355 306,332",
-  35: "472,12 692,12 710,56 694,106 668,142 642,158 605,164 566,148 533,120 502,90 488,62 476,35",
-  36: "393,458 453,449 490,458 522,468 526,502 510,530 483,546 450,550 416,540 393,520 383,497",
-  37: "20,268 145,260 172,272 190,296 186,340 166,362 140,375 98,375 60,360 28,336 20,300",
-  38: "783,305 866,284 900,304 913,346 906,400 890,443 860,465 830,475 800,468 773,446 758,416 760,378 773,346",
-  39: "336,360 402,350 432,362 446,385 443,418 426,442 400,452 370,452 340,440 313,426 306,400 313,370",
-  40: "716,196 793,185 816,206 820,243 806,272 780,288 753,292 726,280 710,260 708,230",
-  41: "605,282 682,272 710,292 726,318 722,355 706,375 680,382 655,385 630,372 613,352 603,325",
-  42: "546,452 590,442 620,448 626,468 620,489 600,500 570,502 546,490 536,470"
-};
-
-function getPolygonCentroid(points) {
-  const coords = points.trim().split(/\s+/).map(p => {
-    const [x, y] = p.split(',').map(Number);
-    return { x, y };
-  });
-  const n = coords.length;
-  return {
-    x: Math.round(coords.reduce((s, p) => s + p.x, 0) / n),
-    y: Math.round(coords.reduce((s, p) => s + p.y, 0) / n)
-  };
-}
-
-// Connect to Socket.io (use stored token if available for cross-domain auth)
 const _storedToken = localStorage.getItem('socketToken');
 const socket = io(BACKEND_URL, {
   withCredentials: true,
   auth: _storedToken ? { token: _storedToken } : {}
 });
 
-// Harta României - Județe (trebuie să fie identică cu server.js)
+// ============================================================
+// HARTA ROMANIEI - poligoane SVG (viewBox 0 0 900 620)
+// ============================================================
+const COUNTY_POLYGONS = {
+  1:  "175,163 215,159 244,183 247,219 234,263 210,275 183,265 165,248 164,223 171,201",
+  2:  "71,113 95,155 113,167 119,205 91,225 63,218 49,184 53,141",
+  3:  "210,275 244,265 266,261 273,295 271,328 255,349 233,355 214,349 214,325 233,311",
+  4:  "421,124 463,137 475,171 471,207 451,233 429,229 423,205 425,184 427,153",
+  5:  "79,65 101,49 201,99 201,139 177,161 135,167 95,155 71,113",
+  6:  "266,93 351,91 363,113 357,143 321,157 289,157 273,135 273,117",
+  7:  "449,31 521,35 529,69 513,105 475,119 461,89 461,59",
+  8:  "541,261 559,281 585,291 601,309 599,339 579,351 559,343 541,323 541,293",
+  9:  "289,203 355,197 375,217 374,263 356,286 331,293 306,283 289,259 289,233",
+  10: "467,295 487,283 511,289 525,303 503,311 491,333 473,335 456,317 456,295",
+  11: "509,397 529,383 543,343 563,351 579,373 577,405 563,425 541,435 519,431 501,415",
+  12: "63,287 98,295 125,281 137,311 134,359 109,378 79,375 57,343 48,311",
+  13: "201,139 273,133 271,153 266,183 244,205 214,209 184,199 174,171 177,153",
+  14: "609,275 619,289 651,307 683,309 720,299 744,323 744,390 734,420 720,434 696,440 672,434 652,424 629,403 619,377 615,351",
+  15: "419,139 453,143 465,169 461,205 435,225 419,205 421,183 425,157",
+  16: "266,261 290,259 307,285 314,319 304,343 283,355 261,355 243,341 243,319 255,295",
+  17: "119,333 141,329 161,341 169,369 163,405 149,421 125,423 105,405 103,379 109,351",
+  18: "541,239 563,229 586,217 603,231 609,275 586,291 560,281 541,261",
+  19: "261,355 283,355 304,345 320,365 314,399 299,419 276,427 255,421 249,403 255,381",
+  20: "133,311 166,289 191,299 197,333 183,365 159,375 141,367 133,341",
+  21: "354,139 419,139 425,157 421,183 399,229 376,229 358,208 354,173",
+  22: "95,155 135,161 171,159 184,199 177,227 167,251 144,258 119,251 111,225 113,205",
+  23: "503,311 525,303 543,311 543,343 529,383 509,397 486,391 471,373 469,347 481,327",
+  24: "521,35 579,41 585,81 578,125 553,149 529,141 513,115 529,69",
+  25: "261,347 281,345 307,353 323,371 321,399 304,417 279,423 257,419 251,405 255,383 263,365",
+  26: "189,41 339,35 356,61 351,97 307,113 229,109 206,83 206,65",
+  27: "109,333 133,311 144,338 141,381 119,393 93,388 81,368 81,344",
+  28: "273,133 354,133 363,151 358,176 323,199 291,203 266,181 266,153",
+  29: "351,113 421,124 427,153 423,184 399,205 375,197 355,173 353,145",
+  30: "171,325 191,338 214,343 233,355 239,388 231,415 211,425 189,419 183,397 169,375 159,353",
+  31: "307,285 331,295 357,288 371,315 363,345 340,361 317,361 304,345 314,319",
+  32: "201,99 266,93 273,117 259,143 225,155 201,151 201,121",
+  33: "101,49 189,41 206,65 201,99 165,113 125,109 89,91 79,65",
+  34: "214,159 266,159 291,183 289,215 266,261 243,265 233,263 233,241 217,221 214,197",
+  35: "339,35 449,31 467,59 461,97 421,124 379,109 356,83 356,61",
+  36: "191,365 214,349 233,355 259,351 266,383 259,417 241,437 221,441 201,435 189,421 186,399",
+  37: "49,184 91,225 113,205 127,235 125,281 98,295 63,287 47,259 49,213",
+  38: "603,231 639,221 687,227 737,245 742,283 720,299 683,309 651,307 619,289 609,275",
+  39: "165,248 183,265 210,275 234,265 239,293 231,325 214,343 191,338 171,325 165,303 164,275",
+  40: "529,141 553,149 565,177 563,221 541,239 541,261 519,231 507,205 511,167",
+  41: "453,235 471,227 491,253 489,279 469,295 456,295 439,273 441,253",
+  42: "277,365 295,361 309,373 307,393 289,403 271,397 265,383"
+};
+
+const COUNTY_LABEL = {
+  1:[205,223], 2:[83,179],  3:[239,311], 4:[443,184],
+  5:[149,131], 6:[318,126], 7:[491,74],  8:[570,313],
+  9:[331,251], 10:[489,310],11:[537,404],12:[93,332],
+  13:[223,173],14:[673,365],15:[440,185],16:[279,311],
+  17:[133,381],18:[573,257],19:[283,396],20:[163,334],
+  21:[386,190],22:[140,211],23:[499,357],24:[549,93],
+  25:[283,386],26:[268,74], 27:[111,362],28:[313,168],
+  29:[387,169],30:[199,391],31:[335,324],32:[233,124],
+  33:[146,79], 34:[249,213],35:[401,74], 36:[225,407],
+  37:[86,246], 38:[671,267],39:[195,297],40:[533,198],
+  41:[463,263],42:[288,382]
+};
+
 const territoriesList = [
-  { id: 1,  name: "Alba",              abbr: "AB", x: 378, y: 295 },
-  { id: 2,  name: "Arad",              abbr: "AR", x: 140, y: 268 },
-  { id: 3,  name: "Argeș",             abbr: "AG", x: 485, y: 415 },
-  { id: 4,  name: "Bacău",             abbr: "BC", x: 685, y: 250 },
-  { id: 5,  name: "Bihor",             abbr: "BH", x: 220, y: 195 },
-  { id: 6,  name: "Bistrița-Năsăud",   abbr: "BN", x: 455, y: 168 },
-  { id: 7,  name: "Botoșani",          abbr: "BT", x: 666, y: 118 },
-  { id: 8,  name: "Brăila",            abbr: "BR", x: 775, y: 398 },
-  { id: 9,  name: "Brașov",            abbr: "BV", x: 555, y: 345 },
-  { id: 10, name: "Buzău",             abbr: "BZ", x: 690, y: 390 },
-  { id: 11, name: "Călărași",          abbr: "CL", x: 685, y: 520 },
-  { id: 12, name: "Caraș-Severin",     abbr: "CS", x: 210, y: 395 },
-  { id: 13, name: "Cluj",              abbr: "CJ", x: 370, y: 220 },
-  { id: 14, name: "Constanța",         abbr: "CT", x: 840, y: 503 },
-  { id: 15, name: "Covasna",           abbr: "CV", x: 630, y: 308 },
-  { id: 16, name: "Dâmbovița",         abbr: "DB", x: 558, y: 450 },
-  { id: 17, name: "Dolj",              abbr: "DJ", x: 385, y: 520 },
-  { id: 18, name: "Galați",            abbr: "GL", x: 830, y: 340 },
-  { id: 19, name: "Giurgiu",           abbr: "GR", x: 575, y: 550 },
-  { id: 20, name: "Gorj",              abbr: "GJ", x: 340, y: 405 },
-  { id: 21, name: "Harghita",          abbr: "HR", x: 562, y: 261 },
-  { id: 22, name: "Hunedoara",         abbr: "HD", x: 305, y: 338 },
-  { id: 23, name: "Ialomița",          abbr: "IL", x: 723, y: 459 },
-  { id: 24, name: "Iași",              abbr: "IS", x: 752, y: 173 },
-  { id: 25, name: "Ilfov",             abbr: "IF", x: 650, y: 448 },
-  { id: 26, name: "Maramureș",         abbr: "MM", x: 400, y: 118 },
-  { id: 27, name: "Mehedinți",         abbr: "MJ", x: 298, y: 462 },
-  { id: 28, name: "Mureș",             abbr: "MS", x: 475, y: 250 },
-  { id: 29, name: "Neamț",             abbr: "NT", x: 628, y: 206 },
-  { id: 30, name: "Olt",               abbr: "OT", x: 450, y: 478 },
-  { id: 31, name: "Prahova",           abbr: "PH", x: 603, y: 400 },
-  { id: 32, name: "Sălaj",             abbr: "SJ", x: 308, y: 175 },
-  { id: 33, name: "Satu Mare",         abbr: "SM", x: 292, y: 102 },
-  { id: 34, name: "Sibiu",             abbr: "SB", x: 435, y: 340 },
-  { id: 35, name: "Suceava",           abbr: "SV", x: 590, y: 118 },
-  { id: 36, name: "Teleorman",         abbr: "TR", x: 505, y: 528 },
-  { id: 37, name: "Timiș",             abbr: "TM", x: 155, y: 338 },
-  { id: 38, name: "Tulcea",            abbr: "TL", x: 866, y: 393 },
-  { id: 39, name: "Vâlcea",            abbr: "VL", x: 415, y: 402 },
-  { id: 40, name: "Vaslui",            abbr: "VS", x: 761, y: 239 },
-  { id: 41, name: "Vrancea",           abbr: "VN", x: 715, y: 325 },
-  { id: 42, name: "București",         abbr: "B",  x: 607, y: 490 }
+  {id:1,name:"Alba",abbr:"AB"},{id:2,name:"Arad",abbr:"AR"},
+  {id:3,name:"Arges",abbr:"AG"},{id:4,name:"Bacau",abbr:"BC"},
+  {id:5,name:"Bihor",abbr:"BH"},{id:6,name:"Bistrita-Nasaud",abbr:"BN"},
+  {id:7,name:"Botosani",abbr:"BT"},{id:8,name:"Braila",abbr:"BR"},
+  {id:9,name:"Brasov",abbr:"BV"},{id:10,name:"Buzau",abbr:"BZ"},
+  {id:11,name:"Calarasi",abbr:"CL"},{id:12,name:"Caras-Severin",abbr:"CS"},
+  {id:13,name:"Cluj",abbr:"CJ"},{id:14,name:"Constanta",abbr:"CT"},
+  {id:15,name:"Covasna",abbr:"CV"},{id:16,name:"Dambovita",abbr:"DB"},
+  {id:17,name:"Dolj",abbr:"DJ"},{id:18,name:"Galati",abbr:"GL"},
+  {id:19,name:"Giurgiu",abbr:"GR"},{id:20,name:"Gorj",abbr:"GJ"},
+  {id:21,name:"Harghita",abbr:"HR"},{id:22,name:"Hunedoara",abbr:"HD"},
+  {id:23,name:"Ialomita",abbr:"IL"},{id:24,name:"Iasi",abbr:"IS"},
+  {id:25,name:"Ilfov",abbr:"IF"},{id:26,name:"Maramures",abbr:"MM"},
+  {id:27,name:"Mehedinti",abbr:"MH"},{id:28,name:"Mures",abbr:"MS"},
+  {id:29,name:"Neamt",abbr:"NT"},{id:30,name:"Olt",abbr:"OT"},
+  {id:31,name:"Prahova",abbr:"PH"},{id:32,name:"Salaj",abbr:"SJ"},
+  {id:33,name:"Satu Mare",abbr:"SM"},{id:34,name:"Sibiu",abbr:"SB"},
+  {id:35,name:"Suceava",abbr:"SV"},{id:36,name:"Teleorman",abbr:"TR"},
+  {id:37,name:"Timis",abbr:"TM"},{id:38,name:"Tulcea",abbr:"TL"},
+  {id:39,name:"Valcea",abbr:"VL"},{id:40,name:"Vaslui",abbr:"VS"},
+  {id:41,name:"Vrancea",abbr:"VN"},{id:42,name:"Bucuresti",abbr:"B"}
 ];
 
 const rawConnections = [
@@ -135,43 +115,33 @@ const rawConnections = [
   [18,38],[18,40],[18,41],
   [19,25],[19,36],
   [20,22],[20,27],[20,39],
-  [21,28],
-  [22,34],
-  [23,25],
+  [21,28],[22,34],[23,25],
   [24,29],[24,35],[24,40],
   [25,31],[25,42],
   [26,32],[26,33],[26,35],
-  [29,35],
-  [30,36],[30,39],
-  [31,41],
-  [32,33],
-  [34,39],
-  [40,41]
+  [29,35],[30,36],[30,39],
+  [31,41],[32,33],[34,39],[40,41]
 ];
 
-// Rebuild full client-side adjacency list
 const adjacencyList = {};
-territoriesList.forEach(t => {
-  adjacencyList[t.id] = [];
-});
-rawConnections.forEach(([n1, n2]) => {
+territoriesList.forEach(t => { adjacencyList[t.id] = []; });
+rawConnections.forEach(([n1,n2]) => {
   if (!adjacencyList[n1].includes(n2)) adjacencyList[n1].push(n2);
   if (!adjacencyList[n2].includes(n1)) adjacencyList[n2].push(n1);
 });
 
-// App State (shared variables)
 let currentUser = null;
 let currentLobby = null;
 let activeGameState = null;
 let questionTimerInterval = null;
+let isSelectionPhase = false;
 
-// Determine current page view mode
 const isIndexPage = document.getElementById('auth-section') !== null;
-const isGamePage = document.getElementById('svg-map-wrapper') !== null;
+const isGamePage  = document.getElementById('svg-map-wrapper') !== null;
 
-// -------------------------------------------------------------
-// INDEX.HTML (LOBBY & AUTH) LOGIC
-// -------------------------------------------------------------
+// ============================================================
+// INDEX.HTML
+// ============================================================
 if (isIndexPage) {
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
@@ -180,23 +150,19 @@ if (isIndexPage) {
   const loginTab = document.getElementById('login-tab');
   const registerTab = document.getElementById('register-tab');
   const authError = document.getElementById('auth-error');
-  
   const authSection = document.getElementById('auth-section');
   const dashboardSection = document.getElementById('dashboard-section');
   const lobbySection = document.getElementById('lobby-section');
-  
   const logoutBtn = document.getElementById('logout-btn');
   const userDisplayName = document.getElementById('user-display-name');
   const userRating = document.getElementById('user-rating');
   const userWins = document.getElementById('user-wins');
   const userLosses = document.getElementById('user-losses');
   const userTerritories = document.getElementById('user-territories');
-  
   const create1v1Btn = document.getElementById('create-1v1-btn');
   const create1v1v1Btn = document.getElementById('create-1v1v1-btn');
   const joinRoomCodeInput = document.getElementById('join-room-code');
   const joinRoomBtn = document.getElementById('join-room-btn');
-  
   const lobbyModeVal = document.getElementById('lobby-mode-val');
   const lobbyCodeVal = document.getElementById('lobby-code-val');
   const lobbyPlayersCount = document.getElementById('lobby-players-count');
@@ -206,45 +172,32 @@ if (isIndexPage) {
   const startGameBtn = document.getElementById('start-game-btn');
   const leaderboardBody = document.getElementById('leaderboard-body');
 
-  // Tab Switching
   tabLoginBtn.addEventListener('click', () => {
-    tabLoginBtn.classList.add('active');
-    tabRegisterBtn.classList.remove('active');
-    loginTab.classList.remove('hidden');
-    registerTab.classList.add('hidden');
+    tabLoginBtn.classList.add('active'); tabRegisterBtn.classList.remove('active');
+    loginTab.classList.remove('hidden'); registerTab.classList.add('hidden');
     authError.classList.add('hidden');
   });
-
   tabRegisterBtn.addEventListener('click', () => {
-    tabRegisterBtn.classList.add('active');
-    tabLoginBtn.classList.remove('active');
-    registerTab.classList.remove('hidden');
-    loginTab.classList.add('hidden');
+    tabRegisterBtn.classList.add('active'); tabLoginBtn.classList.remove('active');
+    registerTab.classList.remove('hidden'); loginTab.classList.add('hidden');
     authError.classList.add('hidden');
   });
 
-  // Handle Authentication Forms
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     authError.classList.add('hidden');
-    
     const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value;
-
     try {
       const res = await fetch(`${BACKEND_URL}/api/login`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        method:'POST', credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({username, password})
       });
       const data = await res.json();
-      if (data.error) {
-        authError.textContent = data.error;
-        authError.classList.remove('hidden');
-      } else {
+      if (data.error) { authError.textContent = data.error; authError.classList.remove('hidden'); }
+      else {
         currentUser = data.user;
-        // Store token and reconnect socket with auth
         if (data.socketToken) {
           localStorage.setItem('socketToken', data.socketToken);
           socket.auth = { token: data.socketToken };
@@ -252,97 +205,59 @@ if (isIndexPage) {
         }
         showDashboard();
       }
-    } catch (err) {
-      console.error(err);
-      authError.textContent = 'Eroare de conexiune la server!';
-      authError.classList.remove('hidden');
-    }
+    } catch(err) { authError.textContent = 'Eroare conexiune!'; authError.classList.remove('hidden'); }
   });
 
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     authError.classList.add('hidden');
-
     const username = document.getElementById('register-username').value.trim();
     const email = document.getElementById('register-email').value.trim();
     const password = document.getElementById('register-password').value;
-
-    if (password.length < 6) {
-      authError.textContent = 'Parola trebuie să aibă minim 6 caractere!';
-      authError.classList.remove('hidden');
-      return;
-    }
-
+    if (password.length < 6) { authError.textContent = 'Parola min 6 caractere!'; authError.classList.remove('hidden'); return; }
     try {
       const res = await fetch(`${BACKEND_URL}/api/register`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password })
+        method:'POST', credentials:'include',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({username, email, password})
       });
       const data = await res.json();
-      if (data.error) {
-        authError.textContent = data.error;
-        authError.classList.remove('hidden');
-      } else {
-        // Automatically fill login and switch to it
+      if (data.error) { authError.textContent = data.error; authError.classList.remove('hidden'); }
+      else {
         document.getElementById('login-username').value = username;
         document.getElementById('login-password').value = password;
         tabLoginBtn.click();
-        authError.textContent = 'Cont creat! Vă puteți autentifica.';
+        authError.textContent = 'Cont creat! Va puteti autentifica.';
         authError.classList.remove('hidden');
         authError.style.borderColor = 'var(--neon-green)';
         authError.style.color = 'var(--neon-green)';
       }
-    } catch (err) {
-      console.error(err);
-      authError.textContent = 'Eroare de conexiune la server!';
-      authError.classList.remove('hidden');
-    }
+    } catch(err) { authError.textContent = 'Eroare conexiune!'; authError.classList.remove('hidden'); }
   });
 
-  // Logout Action
   logoutBtn.addEventListener('click', async () => {
     const socketToken = localStorage.getItem('socketToken');
     await fetch(`${BACKEND_URL}/api/logout`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ socketToken })
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({socketToken})
     });
     localStorage.removeItem('socketToken');
-    socket.auth = { token: null };
+    socket.auth = {token:null};
     currentUser = null;
     showAuth();
   });
 
-  // Lobby actions
-  create1v1Btn.addEventListener('click', () => {
-    socket.emit('create-room', { mode: '1v1' });
-  });
-
-  create1v1v1Btn.addEventListener('click', () => {
-    socket.emit('create-room', { mode: '1v1v1' });
-  });
-
+  create1v1Btn.addEventListener('click', () => socket.emit('create-room', {mode:'1v1'}));
+  create1v1v1Btn.addEventListener('click', () => socket.emit('create-room', {mode:'1v1v1'}));
   joinRoomBtn.addEventListener('click', () => {
     const code = joinRoomCodeInput.value.trim().toUpperCase();
-    if (code.length !== 6) {
-      alert('Codul camerei trebuie să aibă exact 6 caractere!');
-      return;
-    }
-    socket.emit('join-room', { code });
+    if (code.length !== 6) { alert('Cod 6 caractere!'); return; }
+    socket.emit('join-room', {code});
   });
+  leaveLobbyBtn.addEventListener('click', () => socket.emit('leave-lobby'));
+  startGameBtn.addEventListener('click', () => socket.emit('start-game'));
 
-  leaveLobbyBtn.addEventListener('click', () => {
-    socket.emit('leave-lobby');
-  });
-
-  startGameBtn.addEventListener('click', () => {
-    socket.emit('start-game');
-  });
-
-  // View transitions
   function showAuth() {
     authSection.classList.remove('hidden');
     dashboardSection.classList.add('hidden');
@@ -353,576 +268,384 @@ if (isIndexPage) {
     authSection.classList.add('hidden');
     dashboardSection.classList.remove('hidden');
     lobbySection.classList.add('hidden');
-    
-    // Refresh user profile details
     try {
-      const profileRes = await fetch(`${BACKEND_URL}/api/profile`, { credentials: 'include' });
-      if (profileRes.ok) {
-        currentUser = await profileRes.json();
-      }
+      const r = await fetch(`${BACKEND_URL}/api/profile`, {credentials:'include'});
+      if (r.ok) currentUser = await r.json();
     } catch(e) {}
-
     userDisplayName.textContent = currentUser.username;
     userRating.textContent = currentUser.rating;
     userWins.textContent = currentUser.wins;
     userLosses.textContent = currentUser.losses;
     userTerritories.textContent = currentUser.territories_conquered;
-    
-    // Connect socket to lobby
     loadLeaderboard();
   }
 
   async function loadLeaderboard() {
-    leaderboardBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Se încarcă clasamentul...</td></tr>';
+    leaderboardBody.innerHTML = '<tr><td colspan="5" style="text-align:center">Se incarca...</td></tr>';
     try {
-      const res = await fetch(`${BACKEND_URL}/api/leaderboard`, { credentials: 'include' });
-      const leaderboard = await res.json();
+      const res = await fetch(`${BACKEND_URL}/api/leaderboard`, {credentials:'include'});
+      const lb = await res.json();
       leaderboardBody.innerHTML = '';
-      
-      if (leaderboard.length === 0) {
-        leaderboardBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nu există utilizatori în clasament!</td></tr>';
-        return;
-      }
-
-      leaderboard.forEach((user, index) => {
+      if (!lb.length) { leaderboardBody.innerHTML = '<tr><td colspan="5" style="text-align:center">Gol</td></tr>'; return; }
+      lb.forEach((u,i) => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${index + 1}</td>
-          <td><strong>${user.username}</strong></td>
-          <td>${user.rating}</td>
-          <td>${user.wins}</td>
-          <td>${user.territories_conquered}</td>
-        `;
+        tr.innerHTML = `<td>${i+1}</td><td><strong>${u.username}</strong></td><td>${u.rating}</td><td>${u.wins}</td><td>${u.territories_conquered}</td>`;
         leaderboardBody.appendChild(tr);
       });
-    } catch (err) {
-      console.error(err);
-      leaderboardBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#ff1744;">Eroare la încărcare!</td></tr>';
-    }
+    } catch(e) { leaderboardBody.innerHTML = '<tr><td colspan="5" style="color:#ff1744;text-align:center">Eroare!</td></tr>'; }
   }
 
-  // Socket status listeners
-  socket.on('auth-status', ({ loggedIn, user }) => {
-    if (loggedIn) {
-      currentUser = user;
-      showDashboard();
-    } else if (!currentUser) {
-      // Only redirect to login if user didn't just log in via HTTP
-      showAuth();
-    }
+  socket.on('auth-status', ({loggedIn, user}) => {
+    if (loggedIn) { currentUser = user; showDashboard(); }
+    else if (!currentUser) showAuth();
   });
 
-  socket.on('lobby-update', ({ players, host, mode, roomCode }) => {
-    currentLobby = { players, host, mode, roomCode };
-    
+  socket.on('lobby-update', ({players, host, mode, roomCode}) => {
+    currentLobby = {players, host, mode, roomCode};
     dashboardSection.classList.add('hidden');
     lobbySection.classList.remove('hidden');
-
     lobbyModeVal.textContent = mode;
     lobbyCodeVal.textContent = roomCode;
-    
-    const maxPlayers = mode === '1v1' ? 2 : 3;
+    const max = mode === '1v1' ? 2 : 3;
     lobbyPlayersCount.textContent = players.length;
-    lobbyPlayersMax.textContent = maxPlayers;
-
+    lobbyPlayersMax.textContent = max;
     lobbyPlayersList.innerHTML = '';
     players.forEach(p => {
       const isHost = p.socketId === host;
-      const playerCard = document.createElement('div');
-      playerCard.className = `lobby-player-card card ${isHost ? 'is-host' : ''}`;
-      playerCard.innerHTML = `
-        <div class="player-card-avatar">👨‍🎓</div>
-        <div class="player-card-username">${p.username}</div>
-        <div class="player-card-rating">Rating: ${p.rating}</div>
-      `;
-      lobbyPlayersList.appendChild(playerCard);
+      const div = document.createElement('div');
+      div.className = `lobby-player-card card ${isHost ? 'is-host' : ''}`;
+      div.innerHTML = `<div class="player-card-avatar">&#x1F468;&#x200D;&#x1F393;</div><div class="player-card-username">${p.username}</div><div class="player-card-rating">Rating: ${p.rating}</div>`;
+      lobbyPlayersList.appendChild(div);
     });
-
-    // Handle Start Game eligibility
     const isUserHost = socket.id === host;
     if (isUserHost) {
       startGameBtn.classList.remove('hidden');
-      if (players.length === maxPlayers) {
-        startGameBtn.disabled = false;
-        startGameBtn.textContent = 'Pornește Jocul';
-      } else {
-        startGameBtn.disabled = true;
-        startGameBtn.textContent = `Așteptare jucători (${players.length}/${maxPlayers})...`;
-      }
-    } else {
-      startGameBtn.classList.add('hidden');
-    }
+      if (players.length === max) { startGameBtn.disabled = false; startGameBtn.textContent = 'Porneste Jocul'; }
+      else { startGameBtn.disabled = true; startGameBtn.textContent = `Asteptare jucatori (${players.length}/${max})...`; }
+    } else { startGameBtn.classList.add('hidden'); }
   });
 
-  socket.on('left-lobby', () => {
-    currentLobby = null;
-    showDashboard();
-  });
+  socket.on('left-lobby', () => { currentLobby = null; showDashboard(); });
+  socket.on('error-msg', msg => alert(msg));
+  socket.on('game-started', () => { window.location.href = 'game.html'; });
+  socket.on('selection-phase', () => { window.location.href = 'game.html'; });
 
-  socket.on('error-msg', (msg) => {
-    alert(msg);
-  });
-
-  socket.on('game-started', () => {
-    // Redirect all players in this room to the game page!
-    window.location.href = 'game.html';
-  });
-
-  // Check auth on load
   socket.emit('join-lobby');
 }
 
-// -------------------------------------------------------------
-// GAME.HTML (GAME ENGINE & MAP) LOGIC
-// -------------------------------------------------------------
+// ============================================================
+// GAME.HTML
+// ============================================================
 if (isGamePage) {
-  const currentRoundEl = document.getElementById('current-round');
-  const turnBannerEl = document.getElementById('turn-banner');
-  const gameRoomCodeEl = document.getElementById('game-room-code');
-  const playersScoreboardEl = document.getElementById('players-scoreboard');
-  const svgMapWrapper = document.getElementById('svg-map-wrapper');
-  
-  // Question duel elements
-  const questionOverlay = document.getElementById('question-overlay');
-  const attackerAnnouncement = document.getElementById('attacker-announcement');
-  const questionTextVal = document.getElementById('question-text-val');
-  const questionAnswersGrid = document.getElementById('question-answers-grid');
-  const questionCountdown = document.getElementById('question-countdown');
-  const timerProgressCircle = document.getElementById('timer-progress-circle');
-  const timerProgressLine = document.getElementById('timer-progress-line');
-  
-  // Result elements
-  const resultPopup = document.getElementById('result-popup');
-  const resultStatusTitle = document.getElementById('result-status-title');
-  const resultDetails = document.getElementById('result-details');
-  
-  // GameOver elements
-  const gameoverOverlay = document.getElementById('gameover-overlay');
-  const gameWinnerName = document.getElementById('game-winner-name');
-  const gameoverRankingBody = document.getElementById('gameover-ranking-body');
-  const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
+  const currentRoundEl     = document.getElementById('current-round');
+  const turnBannerEl       = document.getElementById('turn-banner');
+  const gameRoomCodeEl     = document.getElementById('game-room-code');
+  const playersScoreboardEl= document.getElementById('players-scoreboard');
+  const svgMapWrapper      = document.getElementById('svg-map-wrapper');
+  const questionOverlay    = document.getElementById('question-overlay');
+  const attackerAnnouncement= document.getElementById('attacker-announcement');
+  const questionTextVal    = document.getElementById('question-text-val');
+  const questionAnswersGrid= document.getElementById('question-answers-grid');
+  const questionCountdown  = document.getElementById('question-countdown');
+  const timerProgressCircle= document.getElementById('timer-progress-circle');
+  const timerProgressLine  = document.getElementById('timer-progress-line');
+  const resultPopup        = document.getElementById('result-popup');
+  const resultStatusTitle  = document.getElementById('result-status-title');
+  const resultDetails      = document.getElementById('result-details');
+  const gameoverOverlay    = document.getElementById('gameover-overlay');
+  const gameWinnerName     = document.getElementById('game-winner-name');
+  const gameoverRankingBody= document.getElementById('gameover-ranking-body');
+  const backToLobbyBtn     = document.getElementById('back-to-lobby-btn');
 
-  // Trigger game rejoin on load (since page reloaded)
   socket.emit('rejoin-game');
+  socket.on('rejoin-failed', () => { window.location.href = 'index.html'; });
 
-  // Handle rejoin failure (e.g. session expired or no active game)
-  socket.on('rejoin-failed', () => {
-    window.location.href = 'index.html';
-  });
-
-  // State sync after page load
-  socket.on('game-state-sync', (state) => {
+  // SELECTION PHASE
+  socket.on('selection-phase', (state) => {
+    isSelectionPhase = true;
     activeGameState = state;
-    gameRoomCodeEl.textContent = state.code;
-    currentRoundEl.textContent = `${state.round}/${state.maxRounds}`;
-    
-    renderScoreboard();
-    renderSvgMap();
-    updateTurnBanner();
-
-    // Check if there was an active attack in progress when we loaded
-    if (state.activeAttack) {
-      showQuestionDuel(state.activeAttack);
-    }
+    if (state.code) gameRoomCodeEl.textContent = state.code;
+    currentRoundEl.textContent = 'ALEGERE START';
+    updateSelectionBanner(state.players, state.selectionTurnIndex);
+    renderScoreboard(state.players, state.selectionTurnIndex);
+    renderSvgMap(state.map, state.players, true, state.selectionTurnIndex);
   });
 
-  // Normal socket game events
+  socket.on('selection-update', ({map, players, selectionTurnIndex}) => {
+    activeGameState.map = map;
+    activeGameState.players = players;
+    activeGameState.selectionTurnIndex = selectionTurnIndex;
+    updateSelectionBanner(players, selectionTurnIndex);
+    renderScoreboard(players, selectionTurnIndex);
+    renderSvgMap(map, players, true, selectionTurnIndex);
+  });
+
+  function updateSelectionBanner(players, idx) {
+    const sel = players[idx];
+    const isMe = sel.socketId === socket.id;
+    turnBannerEl.style.border = `1px solid ${sel.color}`;
+    turnBannerEl.style.color = sel.color;
+    turnBannerEl.textContent = isMe
+      ? 'ALEGE JUDETUL TAU DE START — click pe orice judet liber!'
+      : `${sel.username} alege judetul de start...`;
+  }
+
+  // GAME STARTED
   socket.on('game-started', (state) => {
+    isSelectionPhase = false;
     activeGameState = state;
     if (state.code) gameRoomCodeEl.textContent = state.code;
     currentRoundEl.textContent = `${state.round}/${state.maxRounds}`;
-    renderScoreboard();
-    renderSvgMap();
+    renderScoreboard(state.players, state.turnIndex);
+    renderSvgMap(state.map, state.players, false, state.turnIndex);
     updateTurnBanner();
   });
 
-  socket.on('new-turn', ({ turnIndex, round }) => {
+  socket.on('game-state-sync', (state) => {
+    isSelectionPhase = false;
+    activeGameState = state;
+    gameRoomCodeEl.textContent = state.code;
+    currentRoundEl.textContent = `${state.round}/${state.maxRounds}`;
+    renderScoreboard(state.players, state.turnIndex);
+    renderSvgMap(state.map, state.players, false, state.turnIndex);
+    updateTurnBanner();
+    if (state.activeAttack) showQuestionDuel(state.activeAttack);
+  });
+
+  socket.on('new-turn', ({turnIndex, round}) => {
     if (!activeGameState) return;
-    
-    // Hide any previous question overlay
     questionOverlay.classList.add('hidden');
     clearInterval(questionTimerInterval);
-
     activeGameState.turnIndex = turnIndex;
     activeGameState.round = round;
-
     currentRoundEl.textContent = `${round}/${activeGameState.maxRounds}`;
-    
-    renderScoreboard();
+    renderScoreboard(activeGameState.players, turnIndex);
     updateTurnBanner();
-    highlightAttackableTerritories();
+    renderSvgMap(activeGameState.map, activeGameState.players, false, turnIndex);
   });
 
-  socket.on('question-broadcast', (attackInfo) => {
-    showQuestionDuel(attackInfo);
+  socket.on('question-broadcast', attackInfo => showQuestionDuel(attackInfo));
+
+  socket.on('answer-registered', () => {
+    questionAnswersGrid.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
   });
 
-  socket.on('answer-registered', ({ isCorrect }) => {
-    // Disable answers buttons to prevent multiple clicks
-    const btns = questionAnswersGrid.querySelectorAll('.answer-btn');
-    btns.forEach(btn => btn.disabled = true);
-  });
-
-  socket.on('answer-result', ({ winnerId, winnerUsername, correctIndex, targetId, newOwnerColor, players }) => {
+  socket.on('answer-result', ({winnerId, winnerUsername, correctIndex, targetId, newOwnerColor, players}) => {
     clearInterval(questionTimerInterval);
-    
     if (activeGameState) {
       activeGameState.players = players;
-      
-      // Update local map owner
-      const territory = activeGameState.map.find(t => t.id === targetId);
-      if (territory) {
-        territory.owner = winnerId;
-        territory.color = newColorHex(winnerId, players);
-      }
+      const t = activeGameState.map.find(t => t.id === targetId);
+      if (t) { t.owner = winnerId; t.color = newOwnerColor; }
     }
-
-    // Highlight correct answer button in green and wrong in red
     const btns = questionAnswersGrid.querySelectorAll('.answer-btn');
     btns.forEach((btn, idx) => {
       btn.disabled = true;
-      if (idx === correctIndex) {
-        btn.classList.add('correct');
-      } else if (btn.classList.contains('selected')) {
-        btn.classList.add('incorrect');
-      }
+      if (idx === correctIndex) btn.classList.add('correct');
+      else if (btn.classList.contains('selected')) btn.classList.add('incorrect');
     });
-
-    // Show brief banner overlay
     setTimeout(() => {
       questionOverlay.classList.add('hidden');
-      
       resultPopup.classList.remove('hidden');
+      const territory = activeGameState && activeGameState.map.find(t => t.id === targetId);
       if (winnerId) {
-        const winnerPlayer = players.find(p => p.socketId === winnerId);
-        resultStatusTitle.textContent = "TERITORIU CUCERIT!";
-        resultDetails.innerHTML = `Jucătorul <span style="color:${winnerPlayer.color}; font-weight:bold;">${winnerUsername}</span> a răspuns primul corect și a ocupat <strong>${territory ? territory.name : 'teritoriul'}</strong>!`;
+        const wp = players.find(p => p.socketId === winnerId);
+        resultStatusTitle.textContent = "JUDET CUCERIT!";
+        resultDetails.innerHTML = `<span style="color:${wp ? wp.color : '#fff'};font-weight:bold;">${winnerUsername}</span> a cucerit <strong>${territory ? territory.name : 'judetul'}</strong>!`;
       } else {
-        resultStatusTitle.textContent = "CONTRACRONOMETRU EXPIRAT";
-        resultDetails.innerHTML = `Niciun jucător nu a oferit un răspuns corect. Teritoriul rămâne neatins!`;
+        resultStatusTitle.textContent = "TIMP EXPIRAT";
+        resultDetails.innerHTML = "Niciun raspuns corect. Judetul ramane neschimbat!";
       }
-
-      // Hide results banner after 3.5 seconds
       setTimeout(() => {
         resultPopup.classList.add('hidden');
-        renderScoreboard();
-        renderSvgMap();
+        if (activeGameState) {
+          renderScoreboard(activeGameState.players, activeGameState.turnIndex);
+          renderSvgMap(activeGameState.map, activeGameState.players, false, activeGameState.turnIndex);
+        }
       }, 3500);
-
-    }, 1200); // Wait 1.2s before hiding question and showing results banner
+    }, 1200);
   });
 
-  socket.on('game-over', ({ ranking, winnerUsername, disconnected, message }) => {
+  socket.on('game-over', ({ranking, winnerUsername, disconnected, message}) => {
     clearInterval(questionTimerInterval);
     questionOverlay.classList.add('hidden');
     resultPopup.classList.add('hidden');
-    
     gameoverOverlay.classList.remove('hidden');
-    
-    if (disconnected) {
-      gameWinnerName.textContent = "Niciunul (Jucător Deconectat)";
-      alert(message || 'Jocul s-a încheiat brusc.');
-    } else {
-      gameWinnerName.textContent = winnerUsername;
-    }
-
+    gameWinnerName.textContent = disconnected ? "Deconectat" : winnerUsername;
+    if (disconnected && message) alert(message);
     gameoverRankingBody.innerHTML = '';
-    ranking.forEach((player, idx) => {
+    ranking.forEach((p, i) => {
       const tr = document.createElement('tr');
-      
-      let badgeColorClass = 'neutral';
-      let ratingSign = '';
-      if (player.ratingChange > 0) {
-        badgeColorClass = 'positive';
-        ratingSign = `+${player.ratingChange}`;
-      } else if (player.ratingChange < 0) {
-        badgeColorClass = 'negative';
-        ratingSign = player.ratingChange;
-      } else {
-        ratingSign = '0';
-      }
-
-      tr.innerHTML = `
-        <td>${idx + 1}</td>
-        <td><span style="color:${player.color}; font-weight:bold;">${player.username}</span></td>
-        <td><strong>${player.territoriesCount}</strong></td>
-        <td>${player.newRating}</td>
-        <td><span class="rating-change-val ${badgeColorClass}">${ratingSign}</span></td>
-      `;
+      let cls = 'neutral', sign = '0';
+      if (p.ratingChange > 0) { cls = 'positive'; sign = `+${p.ratingChange}`; }
+      else if (p.ratingChange < 0) { cls = 'negative'; sign = String(p.ratingChange); }
+      tr.innerHTML = `<td>${i+1}</td><td><span style="color:${p.color};font-weight:bold">${p.username}</span></td><td><strong>${p.territoriesCount}</strong></td><td>${p.newRating}</td><td><span class="rating-change-val ${cls}">${sign}</span></td>`;
       gameoverRankingBody.appendChild(tr);
     });
   });
 
-  socket.on('player-disconnected', ({ username }) => {
-    alert(`Jucătorul ${username} s-a deconectat!`);
-  });
+  socket.on('player-disconnected', ({username}) => showToast(`${username} s-a deconectat. Asteptare 15s...`));
+  socket.on('error-msg', msg => alert(msg));
+  backToLobbyBtn.addEventListener('click', () => { window.location.href = 'index.html'; });
 
-  socket.on('error-msg', (msg) => {
-    alert(msg);
-  });
-
-  // Exit Game
-  backToLobbyBtn.addEventListener('click', () => {
-    window.location.href = 'index.html';
-  });
-
-  // Render player list scoreboard on sidebar
-  function renderScoreboard() {
-    if (!activeGameState) return;
+  // SCOREBOARD
+  function renderScoreboard(players, turnIndex) {
+    if (!players) return;
     playersScoreboardEl.innerHTML = '';
-    
-    const activePlayer = activeGameState.players[activeGameState.turnIndex];
-    
-    activeGameState.players.forEach(p => {
-      const isMyTurn = p.socketId === activePlayer.socketId;
+    const active = players[turnIndex];
+    players.forEach(p => {
+      const isMyTurn = active && p.socketId === active.socketId;
       const isMe = p.socketId === socket.id;
-
       const card = document.createElement('div');
       card.className = `scoreboard-player-card ${isMyTurn ? 'active-turn' : ''}`;
-      // Set border color dynamically for active turn
-      if (isMyTurn) {
-        card.style.color = p.color;
-      }
-
+      if (isMyTurn) card.style.color = p.color;
       card.innerHTML = `
         <div class="player-meta">
-          <div class="player-color-dot" style="color: ${p.color}; background-color: ${p.color};"></div>
+          <div class="player-color-dot" style="color:${p.color};background-color:${p.color}"></div>
           <div>
-            <div class="player-name">${p.username} ${isMe ? '(Tu)' : ''}</div>
+            <div class="player-name">${p.username}${isMe ? ' (Tu)' : ''}</div>
             <div class="player-rating-lbl">Rating: ${p.rating}</div>
           </div>
         </div>
         <div class="player-score">
           <span class="count">${p.territoriesCount}</span>
-          <span class="label">Județe</span>
-        </div>
-      `;
+          <span class="label">Judete</span>
+        </div>`;
       playersScoreboardEl.appendChild(card);
     });
   }
 
-  // Update Turn Banner Info
   function updateTurnBanner() {
     if (!activeGameState) return;
-    const activePlayer = activeGameState.players[activeGameState.turnIndex];
-    const isMe = activePlayer.socketId === socket.id;
-    
-    turnBannerEl.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
-    turnBannerEl.style.border = `1px solid ${activePlayer.color}`;
-    turnBannerEl.style.color = activePlayer.color;
-
-    if (isMe) {
-      turnBannerEl.textContent = "ESTE RÂNDUL TĂU • Alege un teritoriu vecin!";
-    } else {
-      turnBannerEl.textContent = `Rândul lui ${activePlayer.username} să atace...`;
-    }
+    const active = activeGameState.players[activeGameState.turnIndex];
+    const isMe = active.socketId === socket.id;
+    turnBannerEl.style.backgroundColor = 'rgba(0,0,0,0.4)';
+    turnBannerEl.style.border = `1px solid ${active.color}`;
+    turnBannerEl.style.color = active.color;
+    turnBannerEl.textContent = isMe
+      ? 'ESTE RANDUL TAU — selecteaza un judet vecin pentru a ataca!'
+      : `Randul lui ${active.username} sa atace...`;
   }
 
-  // Render SVG interactive map cu poligoane geografice
-  function renderSvgMap() {
-    if (!activeGameState) return;
-
+  // SVG MAP cu poligoane reale
+  function renderSvgMap(map, players, selectionMode, activeTurnIndex) {
     svgMapWrapper.innerHTML = '';
-
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("viewBox", "0 0 920 580");
+    svg.setAttribute("viewBox", "0 0 900 620");
     svg.setAttribute("class", "game-map-svg");
 
-    // Fundal harta
-    const bg = document.createElementNS(svgNS, "rect");
-    bg.setAttribute("x", "0");
-    bg.setAttribute("y", "0");
-    bg.setAttribute("width", "920");
-    bg.setAttribute("height", "580");
-    bg.setAttribute("fill", "rgba(0,0,0,0)");
-    svg.appendChild(bg);
+    const activePlayer = players && players[activeTurnIndex];
+    const attackableIds = new Set();
 
-    // Desenare județe ca poligoane (Ilfov înainte de București ca să se suprapună corect)
-    const renderOrder = activeGameState.map.slice().sort((a, b) => {
-      if (a.id === 25) return -1;
-      if (b.id === 25) return 1;
-      return a.id - b.id;
-    });
+    if (!selectionMode && activePlayer && activePlayer.socketId === socket.id) {
+      const myIds = map.filter(t => t.owner === socket.id).map(t => t.id);
+      myIds.forEach(id => {
+        (adjacencyList[id] || []).forEach(nId => {
+          const n = map.find(t => t.id === nId);
+          if (n && n.owner !== socket.id) attackableIds.add(nId);
+        });
+      });
+    }
 
-    renderOrder.forEach(node => {
-      const polyPoints = countyPolygons[node.id];
-      if (!polyPoints) return;
+    map.forEach(node => {
+      const pts = COUNTY_POLYGONS[node.id];
+      if (!pts) return;
+      const lbl = COUNTY_LABEL[node.id];
+      const isOwnedByMe  = node.owner === socket.id;
+      const isAttackable = attackableIds.has(node.id);
+      const isSelectable = selectionMode && node.owner === null;
 
-      const group = document.createElementNS(svgNS, "g");
-      group.setAttribute("class", "svg-node-group");
-      group.setAttribute("id", `node-grp-${node.id}`);
-      group.setAttribute("data-id", node.id);
+      const g = document.createElementNS(svgNS, "g");
+      g.setAttribute("class", "svg-county-group");
+      g.setAttribute("id", `county-${node.id}`);
 
-      const polygon = document.createElementNS(svgNS, "polygon");
-      polygon.setAttribute("points", polyPoints);
-      polygon.setAttribute("class", "county-polygon");
-      polygon.style.fill = node.color;
-      group.appendChild(polygon);
+      const poly = document.createElementNS(svgNS, "polygon");
+      poly.setAttribute("points", pts);
+      poly.setAttribute("class", "svg-county-poly");
+      poly.style.fill = node.color || '#2d3561';
+      if (isOwnedByMe)  poly.classList.add('my-county');
+      if (isAttackable) poly.classList.add('is-attackable');
+      if (isSelectable) poly.classList.add('is-selectable');
+      g.appendChild(poly);
 
-      // Tooltip cu numele complet
       const title = document.createElementNS(svgNS, "title");
       title.textContent = node.name;
-      group.appendChild(title);
+      g.appendChild(title);
 
-      // Abreviere centrată pe poligon
-      const centroid = getPolygonCentroid(polyPoints);
       const text = document.createElementNS(svgNS, "text");
-      text.setAttribute("x", centroid.x);
-      text.setAttribute("y", centroid.y);
-      text.setAttribute("class", "svg-node-text");
-      text.textContent = node.abbr || node.name;
-      group.appendChild(text);
+      text.setAttribute("x", lbl[0]);
+      text.setAttribute("y", lbl[1]);
+      text.setAttribute("class", "svg-county-text");
+      text.textContent = node.abbr;
+      g.appendChild(text);
 
-      group.addEventListener('click', () => {
-        if (group.classList.contains('is-attackable')) {
-          socket.emit('attack-territory', { targetId: node.id });
-        }
-      });
+      if ((selectionMode && isSelectable) || (!selectionMode && isAttackable)) {
+        g.style.cursor = 'pointer';
+        g.addEventListener('click', () => {
+          if (selectionMode) socket.emit('select-starting-territory', {territoryId: node.id});
+          else socket.emit('attack-territory', {targetId: node.id});
+        });
+      }
 
-      svg.appendChild(group);
+      svg.appendChild(g);
     });
 
     svgMapWrapper.appendChild(svg);
-    highlightAttackableTerritories();
   }
 
-  // Highlight which territories the player can click to attack
-  function highlightAttackableTerritories() {
-    if (!activeGameState) return;
-    
-    // Clear all highlights
-    document.querySelectorAll('.svg-node-group').forEach(grp => {
-      grp.classList.remove('is-attackable');
-      grp.classList.remove('my-territory');
-    });
-    
-    // Mark mine
-    activeGameState.map.forEach(node => {
-      const grp = document.getElementById(`node-grp-${node.id}`);
-      if (grp && node.owner === socket.id) {
-        grp.classList.add('my-territory');
-      }
-    });
-
-    // If it's my turn, highlight valid adjacent targets
-    const activePlayer = activeGameState.players[activeGameState.turnIndex];
-    if (activePlayer.socketId === socket.id) {
-      // Find my owned territory IDs
-      const myOwnedIds = activeGameState.map
-        .filter(node => node.owner === socket.id)
-        .map(node => node.id);
-
-      // Find neighbors that are NOT owned by me
-      const attackableTargets = new Set();
-      myOwnedIds.forEach(myId => {
-        const neighbors = adjacencyList[myId] || [];
-        neighbors.forEach(nId => {
-          const neighborNode = activeGameState.map.find(t => t.id === nId);
-          if (neighborNode && neighborNode.owner !== socket.id) {
-            attackableTargets.add(nId);
-          }
-        });
-      });
-
-      // Add class to SVG nodes
-      attackableTargets.forEach(tId => {
-        const grp = document.getElementById(`node-grp-${tId}`);
-        if (grp) {
-          grp.classList.add('is-attackable');
-        }
-      });
-    }
-  }
-
-  // Display the Speed Quiz question overlay
+  // QUESTION DUEL
   function showQuestionDuel(attackInfo) {
     clearInterval(questionTimerInterval);
-
-    // Render attacker label
-    attackerAnnouncement.textContent = `⚔️ ${attackInfo.attackerUsername} ATACĂ TERITORIUL!`;
+    attackerAnnouncement.textContent = `${attackInfo.attackerUsername} ATACA!`;
     questionTextVal.textContent = attackInfo.questionText;
-    
-    // Draw answers buttons
     questionAnswersGrid.innerHTML = '';
-    attackInfo.answers.forEach((ansText, idx) => {
+    attackInfo.answers.forEach((ans, idx) => {
       const btn = document.createElement('button');
       btn.className = 'answer-btn';
-      btn.textContent = ansText;
+      btn.textContent = ans;
       btn.addEventListener('click', () => {
-        // Highlight selection locally
-        const buttons = questionAnswersGrid.querySelectorAll('.answer-btn');
-        buttons.forEach(b => b.classList.remove('selected'));
+        questionAnswersGrid.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
-        
-        socket.emit('submit-answer', { answerIndex: idx });
+        socket.emit('submit-answer', {answerIndex: idx});
       });
       questionAnswersGrid.appendChild(btn);
     });
-
-    // Disable buttons if player already answered in case of sync rejoin
-    if (attackInfo.hasAnswered) {
-      const buttons = questionAnswersGrid.querySelectorAll('.answer-btn');
-      buttons.forEach(b => b.disabled = true);
-    }
-
+    if (attackInfo.hasAnswered) questionAnswersGrid.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
     questionOverlay.classList.remove('hidden');
-
-    // Run timer animation (20 seconds standard duration)
     const duration = attackInfo.duration || 20000;
-    const timeRemaining = attackInfo.timeRemaining !== undefined ? attackInfo.timeRemaining : duration;
-    
-    let timeLeftMs = timeRemaining;
-    const stepInterval = 100; // Tick every 100ms
-    
+    let timeLeftMs = attackInfo.timeRemaining !== undefined ? attackInfo.timeRemaining : duration;
     updateTimerUI(timeLeftMs, duration);
-
     questionTimerInterval = setInterval(() => {
-      timeLeftMs -= stepInterval;
-      if (timeLeftMs <= 0) {
-        timeLeftMs = 0;
-        clearInterval(questionTimerInterval);
-      }
+      timeLeftMs -= 100;
+      if (timeLeftMs <= 0) { timeLeftMs = 0; clearInterval(questionTimerInterval); }
       updateTimerUI(timeLeftMs, duration);
-    }, stepInterval);
+    }, 100);
   }
 
-  // Update SVG timer progress and linear line progress
   function updateTimerUI(timeLeftMs, duration) {
-    const secondsLeft = Math.ceil(timeLeftMs / 1000);
-    questionCountdown.textContent = secondsLeft;
-    
-    const percentage = (timeLeftMs / duration) * 100;
-    
-    // Circle progress (SVG stroke-dasharray)
-    // Circle circumference is roughly 100
+    const sec = Math.ceil(timeLeftMs / 1000);
+    questionCountdown.textContent = sec;
+    const pct = (timeLeftMs / duration) * 100;
     if (timerProgressCircle) {
-      timerProgressCircle.setAttribute("stroke-dasharray", `${percentage}, 100`);
-      // Transition color based on urgency
-      if (percentage > 50) {
-        timerProgressCircle.style.stroke = "var(--neon-blue)";
-      } else if (percentage > 25) {
-        timerProgressCircle.style.stroke = "var(--neon-yellow)";
-      } else {
-        timerProgressCircle.style.stroke = "var(--neon-pink)";
-      }
+      timerProgressCircle.setAttribute("stroke-dasharray", `${pct}, 100`);
+      timerProgressCircle.style.stroke = pct > 50 ? "var(--neon-blue)" : pct > 25 ? "var(--neon-yellow)" : "var(--neon-pink)";
     }
-
-    // Line progress
     if (timerProgressLine) {
-      timerProgressLine.style.transform = `scaleX(${percentage / 100})`;
-      if (percentage <= 25) {
-        timerProgressLine.style.background = "var(--neon-pink)";
-      } else {
-        timerProgressLine.style.background = "linear-gradient(90deg, var(--neon-blue), var(--neon-pink))";
-      }
+      timerProgressLine.style.transform = `scaleX(${pct/100})`;
+      timerProgressLine.style.background = pct <= 25 ? "var(--neon-pink)" : "linear-gradient(90deg,var(--neon-blue),var(--neon-pink))";
     }
   }
 
-  // Helper function to extract user colors mapping
-  function newColorHex(socketId, players) {
-    if (!socketId) return '#4a5568';
-    const p = players.find(player => player.socketId === socketId);
-    return p ? p.color : '#4a5568';
+  function showToast(msg) {
+    let t = document.getElementById('game-toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'game-toast';
+      t.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(255,234,0,.15);border:1px solid var(--neon-yellow);color:var(--neon-yellow);padding:12px 24px;border-radius:8px;z-index:200;font-family:var(--font-title);font-size:.9rem;';
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 6000);
   }
 }

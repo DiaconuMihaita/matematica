@@ -448,7 +448,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Start Game
+  // Start Game — enters selection phase first
   socket.on('start-game', () => {
     const roomCode = socket.currentRoom;
     const room = rooms[roomCode];
@@ -463,56 +463,76 @@ io.on('connection', (socket) => {
       return socket.emit('error-msg', `Sunt necesari ${requiredPlayers} jucători pentru a începe!`);
     }
 
-    room.status = 'playing';
-
-    // Assign bases and colors — SM (northwest), GL (southeast), DJ (southwest)
-    const baseTerritoryIds = [33, 18, 17];
+    room.status = 'selecting';
     const playerColors = ['#00f0ff', '#ff007f', '#ffea00'];
-
     room.players.forEach((player, idx) => {
       player.color = playerColors[idx];
-      player.baseTerritoryId = baseTerritoryIds[idx];
-      player.territoriesCount = 1;
+      player.territoriesCount = 0;
     });
 
-    const mapState = territoriesList.map(t => {
-      let owner = null;
-      let color = '#4a5568';
-
-      room.players.forEach(p => {
-        if (p.baseTerritoryId === t.id) {
-          owner = p.socketId;
-          color = p.color;
-        }
-      });
-
-      return {
-        id: t.id,
-        name: t.name,
-        abbr: t.abbr,
-        x: t.x,
-        y: t.y,
-        owner: owner,
-        color: color
-      };
-    });
+    const mapState = territoriesList.map(t => ({
+      id: t.id, name: t.name, abbr: t.abbr, owner: null, color: '#2d3561'
+    }));
 
     room.gameState = {
       map: mapState,
+      selectionTurnIndex: 0,
+      selectionsLeft: room.players.length,
       turnIndex: 0,
       round: 1,
       maxRounds: 20,
       activeAttack: null
     };
 
-    io.to(room.code).emit('game-started', {
+    io.to(room.code).emit('selection-phase', {
       code: room.code,
       players: room.players,
       map: room.gameState.map,
-      turnIndex: room.gameState.turnIndex,
-      round: room.gameState.round,
-      maxRounds: room.gameState.maxRounds
+      selectionTurnIndex: 0
     });
+  });
+
+  // Player selects starting territory
+  socket.on('select-starting-territory', ({ territoryId }) => {
+    const roomCode = socket.currentRoom;
+    const room = rooms[roomCode];
+    if (!room || room.status !== 'selecting') return;
+
+    const gameState = room.gameState;
+    const activePlayer = room.players[gameState.selectionTurnIndex];
+    if (activePlayer.socketId !== socket.id) {
+      return socket.emit('error-msg', 'Nu este rândul tău să selectezi!');
+    }
+
+    const territory = gameState.map.find(t => t.id === territoryId);
+    if (!territory || territory.owner !== null) {
+      return socket.emit('error-msg', 'Județul este deja ocupat!');
+    }
+
+    territory.owner = socket.id;
+    territory.color = activePlayer.color;
+    activePlayer.territoriesCount = 1;
+    gameState.selectionsLeft--;
+    gameState.selectionTurnIndex = (gameState.selectionTurnIndex + 1) % room.players.length;
+
+    if (gameState.selectionsLeft === 0) {
+      // All players selected — begin game
+      room.status = 'playing';
+      io.to(room.code).emit('game-started', {
+        code: room.code,
+        players: room.players,
+        map: gameState.map,
+        turnIndex: 0,
+        round: 1,
+        maxRounds: gameState.maxRounds
+      });
+    } else {
+      io.to(room.code).emit('selection-update', {
+        map: gameState.map,
+        players: room.players,
+        selectionTurnIndex: gameState.selectionTurnIndex
+      });
+    }
   });
 
   // Rejoin Game logic for page switching
@@ -530,7 +550,7 @@ io.on('connection', (socket) => {
       }
     }
 
-    if (!foundRoom || foundRoom.status !== 'playing') {
+    if (!foundRoom || (foundRoom.status !== 'playing' && foundRoom.status !== 'selecting')) {
       return socket.emit('rejoin-failed');
     }
 
@@ -576,6 +596,16 @@ io.on('connection', (socket) => {
 
     socket.currentRoom = foundRoom.code;
     socket.join(foundRoom.code);
+
+    if (foundRoom.status === 'selecting') {
+      return socket.emit('selection-phase', {
+        code: foundRoom.code,
+        players: foundRoom.players,
+        map: foundRoom.gameState.map,
+        selectionTurnIndex: foundRoom.gameState.selectionTurnIndex,
+        isRejoin: true
+      });
+    }
 
     // Send full state sync
     socket.emit('game-state-sync', {
@@ -718,7 +748,7 @@ io.on('connection', (socket) => {
             host: room.host
           });
         }
-      } else if (room.status === 'playing') {
+      } else if (room.status === 'playing' || room.status === 'selecting') {
         // Give player 10 seconds to reconnect (page navigation to game.html)
         const player = room.players.find(p => p.socketId === socket.id);
         if (player) {

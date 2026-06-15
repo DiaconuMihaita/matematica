@@ -823,19 +823,60 @@ button:disabled {
 }
 
 /* Text abreviere județ */
-.svg-node-text {
+.svg-node-text, .svg-county-text {
   fill: rgba(255, 255, 255, 0.92);
   font-family: var(--font-title);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   text-anchor: middle;
   dominant-baseline: central;
   pointer-events: none;
   paint-order: stroke;
-  stroke: rgba(0, 0, 0, 0.7);
+  stroke: rgba(0, 0, 0, 0.8);
   stroke-width: 2.5px;
   stroke-linejoin: round;
   letter-spacing: 0.3px;
+}
+
+/* Clase noi pentru harta cu poligoane */
+.svg-county-group { cursor: default; }
+
+.svg-county-poly {
+  stroke: rgba(255,255,255,0.22);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  transition: filter 0.2s ease, stroke 0.2s ease, stroke-width 0.2s ease;
+}
+
+.svg-county-group:hover .svg-county-poly {
+  stroke: rgba(255,255,255,0.8);
+  stroke-width: 2.5px;
+  filter: brightness(1.3);
+}
+
+.svg-county-poly.my-county {
+  stroke: #fff;
+  stroke-width: 2.5px;
+  filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+}
+
+.svg-county-poly.is-attackable {
+  stroke: var(--neon-green);
+  stroke-width: 3px;
+  cursor: pointer;
+  animation: attackPulse 1.5s ease-in-out infinite;
+}
+
+.svg-county-poly.is-selectable {
+  stroke: var(--neon-blue);
+  stroke-width: 2.5px;
+  cursor: pointer;
+  animation: selectPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes selectPulse {
+  0%,100% { stroke-width: 2px; filter: brightness(1.1); }
+  50%      { stroke-width: 3.5px; filter: brightness(1.5) drop-shadow(0 0 8px var(--neon-blue)); }
 }
 
 /* Overlay / Modal structures */

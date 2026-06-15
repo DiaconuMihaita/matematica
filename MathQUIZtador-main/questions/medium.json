@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "question": "Care este limita: lim (x -> 0) (sin(x) / x)?",
+    "answers": ["1", "0", "∞", "Nu există"],
+    "correct": 0
+  },
+  {
+    "id": 2,
+    "question": "Calculați determinantul matricei A = [[1, 2], [3, 8]].",
+    "answers": ["2", "14", "-2", "8"],
+    "correct": 0
+  },
+  {
+    "id": 3,
+    "question": "Calculați derivata funcției f(x) = ln(x² + 1).",
+    "answers": ["2x / (x² + 1)", "1 / (x² + 1)", "2x * ln(x² + 1)", "2 / (x² + 1)"],
+    "correct": 0
+  },
+  {
+    "id": 4,
+    "question": "Calculați limita la infinit: lim (x -> ∞) (2x² - 3x + 1) / (x² + 5).",
+    "answers": ["2", "∞", "0", "2/5"],
+    "correct": 0
+  },
+  {
+    "id": 5,
+    "question": "Punctele de discontinuitate ale funcției f(x) = 1 / (x - 3) sunt:",
+    "answers": ["x = 3", "x = -3", "x = 0", "Nu are puncte de discontinuitate"],
+    "correct": 0
+  },
+  {
+    "id": 6,
+    "question": "Matricea A = [[1, a], [2, 4]] nu este inversabilă pentru parametrul a egal cu:",
+    "answers": ["2", "0", "4", "-2"],
+    "correct": 0
+  },
+  {
+    "id": 7,
+    "question": "Pentru f(x) = x³ - 3x, care sunt punctele de extrem local (critice)?",
+    "answers": ["x ∈ {-1, 1}", "x ∈ {0}", "x ∈ {-3, 3}", "x ∈ {-√3, √3}"],
+    "correct": 0
+  },
+  {
+    "id": 8,
+    "question": "Calculați determinantul matricei A = [[1, 1, 1], [0, 2, 3], [0, 0, 4]].",
+    "answers": ["8", "9", "0", "6"],
+    "correct": 0
+  },
+  {
+    "id": 9,
+    "question": "Derivata funcției f(x) = cos(2x) este:",
+    "answers": ["-2*sin(2x)", "2*sin(2x)", "-sin(2x)", "-2*cos(2x)"],
+    "correct": 0
+  },
+  {
+    "id": 10,
+    "question": "Ecuația asimptotei orizontale spre +∞ a funcției f(x) = x / (x + 1) este:",
+    "answers": ["y = 1", "y = 0", "x = -1", "y = -1"],
+    "correct": 0
+  }
+]

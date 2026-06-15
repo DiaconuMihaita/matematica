@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bătălia MathQUIZtador - Matematica clasa a XI-a</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="game-body">
+
+  <!-- Background Graphics -->
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <!-- Main Game Container -->
+  <div class="game-container">
+    
+    <!-- TOP NAVBAR -->
+    <header class="game-header">
+      <div class="header-left">
+        <a href="index.html" class="logo-sm">Math<span>QUIZtador</span></a>
+      </div>
+      
+      <div class="header-center">
+        <div class="game-info-badge">
+          <span>Rundă</span>
+          <strong id="current-round">1/15</strong>
+        </div>
+        <div class="turn-indicator" id="turn-banner">
+          Se încarcă runda...
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="room-code-badge">
+          <span>Cameră:</span>
+          <strong id="game-room-code">------</strong>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN INTERFACE -->
+    <div class="game-main">
+      
+      <!-- SIDEBAR: PLAYERS -->
+      <aside class="game-sidebar card">
+        <h3>Jucători</h3>
+        <div class="scoreboard-list" id="players-scoreboard">
+          <!-- Populated dynamically -->
+        </div>
+
+        <hr class="card-divider">
+        
+        <div class="game-rules-card">
+          <h4>Ghid de Joc</h4>
+          <ul>
+            <li>Dă click pe un <strong>județ vecin</strong> celor pe care le deții pentru a-l ataca.</li>
+            <li>Când pornește atacul, o întrebare apare pentru ambii jucători în duel.</li>
+            <li><strong>Primul</strong> care răspunde corect cucerește județul!</li>
+            <li>Răspunsul greșit te elimină din runda curentă.</li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- CENTER: MAP CANVAS -->
+      <main class="map-view-card card">
+        <div class="map-header">
+          <h3>Harta Județelor României • Matematică XI</h3>
+          <span class="map-legend">Județele tale au contur evidențiat | Hover = nume complet</span>
+        </div>
+        
+        <div class="map-wrapper" id="svg-map-wrapper">
+          <!-- The interactive SVG map will be rendered here dynamically -->
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- QUESTION MODAL (SPEED DUEL OVERLAY) -->
+  <div class="overlay hidden" id="question-overlay">
+    <div class="modal question-modal card">
+      <div class="question-header">
+        <span class="badge badge-accent" id="question-tag">SPEED DUEL</span>
+        <div class="question-timer-container">
+          <svg class="timer-svg" viewBox="0 0 36 36">
+            <path class="timer-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="timer-progress" id="timer-progress-circle" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          </svg>
+          <span id="question-countdown">20</span>
+        </div>
+      </div>
+      
+      <div class="question-body">
+        <p class="attacker-indicator" id="attacker-announcement">Utilizator atacă Teritoriul!</p>
+        <h2 class="question-text" id="question-text-val">Se încarcă întrebarea...</h2>
+      </div>
+
+      <div class="answers-grid" id="question-answers-grid">
+        <!-- 4 buttons loaded dynamically -->
+      </div>
+
+      <div class="question-footer-bar">
+        <div class="timer-line-container">
+          <div class="timer-line" id="timer-progress-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT / CONQUERED POPUP MODAL (Brief overlay before next turn) -->
+  <div class="battle-result-popup hidden" id="result-popup">
+    <div class="result-card card">
+      <h3 id="result-status-title">Bătălie Încheiată</h3>
+      <p id="result-details">Jucătorul X a răspuns corect și a cucerit teritoriul!</p>
+    </div>
+  </div>
+
+  <!-- GAME OVER MODAL -->
+  <div class="overlay hidden" id="gameover-overlay">
+    <div class="modal gameover-modal card fade-in">
+      <div class="gameover-header">
+        <div class="crown-icon">🏆</div>
+        <h2>Joc Finalizat!</h2>
+        <p class="winner-announcement">Câștigător: <span id="game-winner-name" class="highlight-text">Nume</span></p>
+      </div>
+
+      <div class="gameover-body">
+        <h3>Clasament Final & Modificări Rating</h3>
+        <div class="ranking-table-container">
+          <table class="ranking-table">
+            <thead>
+              <tr>
+                <th>Loc</th>
+                <th>Jucător</th>
+                <th>Teritorii</th>
+                <th>Rating</th>
+                <th>Diferență</th>
+              </tr>
+            </thead>
+            <tbody id="gameover-ranking-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="gameover-footer">
+        <button id="back-to-lobby-btn" class="btn btn-primary btn-large btn-block">Înapoi în Meniu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Socket.io and Client Scripts -->
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

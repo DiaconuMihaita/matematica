@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathQUIZtador - ConQUIZtador Matematica clasa a XI-a</title>
+  <meta name="description" content="Joc web multiplayer online inspirat din ConQUIZtador, bazat pe matematica de clasa a XI-a. Limite, matrice, derivate și determinanți.">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Animated Elements -->
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <div class="app-container">
+    <header class="app-header">
+      <h1 class="logo">Math<span>QUIZtador</span></h1>
+      <p class="subtitle">Bătălia Cunoașterii Matematice • Clasa a XI-a</p>
+    </header>
+
+    <!-- AUTH SECTION -->
+    <section id="auth-section" class="card fade-in">
+      <div class="auth-tabs">
+        <button id="tab-login-btn" class="auth-tab-btn active">Autentificare</button>
+        <button id="tab-register-btn" class="auth-tab-btn">Înregistrare</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="login-tab" class="auth-tab-content">
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-username">Nume Utilizator</label>
+            <input type="text" id="login-username" placeholder="Introduceți numele de utilizator" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="login-password">Parolă</label>
+            <input type="password" id="login-password" placeholder="Introduceți parola" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Intră în Joc</button>
+        </form>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-tab" class="auth-tab-content hidden">
+        <form id="register-form">
+          <div class="form-group">
+            <label for="register-username">Nume Utilizator</label>
+            <input type="text" id="register-username" placeholder="Alegeți un nume de utilizator" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="register-email">Email</label>
+            <input type="email" id="register-email" placeholder="Introduceți adresa de email" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="register-password">Parolă</label>
+            <input type="password" id="register-password" placeholder="Minim 6 caractere" required autocomplete="new-password">
+          </div>
+          <button type="submit" class="btn btn-accent btn-block">Creează Cont</button>
+        </form>
+      </div>
+      <div id="auth-error" class="error-msg hidden"></div>
+    </section>
+
+    <!-- DASHBOARD SECTION -->
+    <section id="dashboard-section" class="hidden fade-in">
+      <div class="grid-layout">
+        <!-- User Stats & Actions -->
+        <div class="card user-profile-card">
+          <div class="user-header">
+            <div class="user-avatar">∑</div>
+            <div>
+              <h2 id="user-display-name">Utilizator</h2>
+              <p class="rating-badge">Rating: <span id="user-rating">1000</span></p>
+            </div>
+            <button id="logout-btn" class="btn btn-danger btn-sm">Ieșire</button>
+          </div>
+          
+          <div class="stats-row">
+            <div class="stat-item">
+              <span class="stat-value" id="user-wins">0</span>
+              <span class="stat-label">Victorii</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="user-losses">0</span>
+              <span class="stat-label">Înfrângeri</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="user-territories">0</span>
+              <span class="stat-label">Teritorii</span>
+            </div>
+          </div>
+
+          <hr class="card-divider">
+
+          <div class="lobby-controls">
+            <h3>Joacă Multiplayer</h3>
+            
+            <div class="control-group">
+              <label>1. Creează Cameră Nouă</label>
+              <div class="btn-group-row">
+                <button id="create-1v1-btn" class="btn btn-primary">Mod 1v1 (2J)</button>
+                <button id="create-1v1v1-btn" class="btn btn-accent">Mod 1v1v1 (3J)</button>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label for="join-room-code">2. Alătură-te unei Camere Existente</label>
+              <div class="join-input-row">
+                <input type="text" id="join-room-code" placeholder="Cod Cameră (Ex: AX34B)" maxlength="6">
+                <button id="join-room-btn" class="btn btn-primary">Alătură-te</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div class="card leaderboard-card">
+          <h2>Top 10 Jucători</h2>
+          <div class="table-container">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>Loc</th>
+                  <th>Jucător</th>
+                  <th>Rating</th>
+                  <th>Victorii</th>
+                  <th>Cuceriri</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-body">
+                <!-- Loaded dynamically -->
+                <tr><td colspan="5" style="text-align:center;">Se încarcă clasamentul...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOBBY ROOM SECTION -->
+    <section id="lobby-section" class="card lobby-card hidden fade-in">
+      <div class="lobby-room-header">
+        <div>
+          <h2>Cameră Așteptare</h2>
+          <p class="lobby-mode-tag">Mod: <span id="lobby-mode-val">1v1</span></p>
+        </div>
+        <div class="room-code-display">
+          <span>Cod Cameră</span>
+          <strong id="lobby-code-val">------</strong>
+        </div>
+      </div>
+
+      <div class="lobby-players-container">
+        <h3>Jucători Conectați (<span id="lobby-players-count">0</span>/<span id="lobby-players-max">2</span>)</h3>
+        <div id="lobby-players-list" class="players-list-grid">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+
+      <div class="lobby-actions">
+        <button id="leave-lobby-btn" class="btn btn-danger">Părăsește Camera</button>
+        <button id="start-game-btn" class="btn btn-success btn-large" disabled>Așteptare Jucători...</button>
+      </div>
+    </section>
+  </div>
+
+  <footer class="app-footer">
+    <p>&copy; 2026 MathQUIZtador. Proiect de Matematică Interactivă Clasa a XI-a.</p>
+  </footer>
+
+  <!-- Socket.io and Client Scripts -->
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

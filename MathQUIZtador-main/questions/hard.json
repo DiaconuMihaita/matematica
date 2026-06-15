@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "question": "Calculați limita: lim (x -> 0) (e^x - 1 - x) / x².",
+    "answers": ["1/2", "1", "0", "∞"],
+    "correct": 0
+  },
+  {
+    "id": 2,
+    "question": "Sistemul cu ecuațiile x+y+z=1, x+ay+z=1, x+y+az=a este compatibil determinat dacă și numai dacă:",
+    "answers": ["a ∈ ℝ \\ {1}", "a = 1", "a ∈ ℝ \\ {0, 1}", "a = 0"],
+    "correct": 0
+  },
+  {
+    "id": 3,
+    "question": "Dacă A = [[1, 1], [0, 1]], atunci A^n pentru n ∈ ℕ* este:",
+    "answers": ["[[1, n], [0, 1]]", "[[1, 1], [0, 1]]", "[[1, n²], [0, 1]]", "[[n, n], [0, n]]"],
+    "correct": 0
+  },
+  {
+    "id": 4,
+    "question": "Funcția f(x) = {x² + ax + 1 pentru x ≤ 1; 2x + b pentru x > 1} este derivabilă pe ℝ pentru:",
+    "answers": ["a = 0, b = 0", "a = 1, b = 1", "a = 2, b = -1", "a = 0, b = 1"],
+    "correct": 0
+  },
+  {
+    "id": 5,
+    "question": "Fie matricea A = [[2, -1], [4, -2]]. Care este rangul matricei A^2026?",
+    "answers": ["0", "1", "2", "2026"],
+    "correct": 0
+  },
+  {
+    "id": 6,
+    "question": "Calculați limita: lim (x -> 0) (1 + x)^(1 / sin(x)).",
+    "answers": ["e", "1", "e²", "∞"],
+    "correct": 0
+  },
+  {
+    "id": 7,
+    "question": "Pentru ce valori reale m ecuația x³ - 3x + m = 0 are 3 rădăcini reale distincte?",
+    "answers": ["m ∈ (-2, 2)", "m ∈ (-∞, -2) ∪ (2, ∞)", "m ∈ [-2, 2]", "m ∈ ℝ"],
+    "correct": 0
+  },
+  {
+    "id": 8,
+    "question": "Fie A o matrice pătratică de ordinul 3 cu det(A) = 4. Cât este det(2A)?",
+    "answers": ["32", "8", "12", "4"],
+    "correct": 0
+  },
+  {
+    "id": 9,
+    "question": "Ecuația asimptotei oblice spre +∞ a funcției f(x) = (x² + 2x) / (x - 1) este:",
+    "answers": ["y = x + 3", "y = x + 2", "y = x", "y = x - 1"],
+    "correct": 0
+  },
+  {
+    "id": 10,
+    "question": "Care este numărul de puncte de inflexiune ale funcției f(x) = x⁴ - 6x² + 5?",
+    "answers": ["2", "0", "1", "4"],
+    "correct": 0
+  }
+]

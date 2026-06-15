@@ -73,8 +73,8 @@ const sessionMiddleware = session({
   saveUninitialized: false,
   cookie: {
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'none',
-    secure: true
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: process.env.NODE_ENV === 'production'
   }
 });
 
@@ -599,6 +599,9 @@ io.on('connection', (socket) => {
     socket.currentRoom = foundRoom.code;
     socket.join(foundRoom.code);
 
+    // Notify others that this player reconnected
+    socket.to(foundRoom.code).emit('player-reconnected', { username: player.username });
+
     if (foundRoom.status === 'selecting') {
       return socket.emit('selection-phase', {
         code: foundRoom.code,
@@ -756,21 +759,21 @@ io.on('connection', (socket) => {
         if (player) {
           console.log(`Player ${player.username} disconnected from room ${roomCode}. Waiting 60s for rejoin.`);
           player.disconnected = true;
-          
+
+          // Immediately notify others that this player disconnected
+          io.to(room.code).emit('player-disconnected', { username: player.username });
+
           // Clear any existing timer just in case
           if (player.reconnectTimer) clearTimeout(player.reconnectTimer);
-          
+
           player.reconnectTimer = setTimeout(() => {
             if (player.disconnected && rooms[roomCode]) {
               console.log(`Player ${player.username} failed to reconnect within 60s. Removing from room.`);
               room.players = room.players.filter(p => p.socketId !== player.socketId);
-              
-              // Notify others
-              io.to(room.code).emit('player-disconnected', { username: player.username });
-              
-              // End game only if no one else is connected
+
+              // End game if fewer than 2 players remain connected
               const stillConnected = room.players.filter(p => !p.disconnected);
-              if (stillConnected.length <= (room.mode === '1v1' ? 0 : 1)) {
+              if (stillConnected.length < 2) {
                 console.log(`Not enough players left in room ${roomCode}. Finishing game.`);
                 endGameDueToDisconnect(room);
               }
@@ -879,12 +882,21 @@ function advanceTurn(room) {
   const gameState = room.gameState;
   if (!gameState) return;
 
-  // Advance turn index (skip players with 0 territories only if they never had any at start — everyone starts with 1)
   gameState.turnIndex = (gameState.turnIndex + 1) % room.players.length;
 
   // If we've gone through all players, increment round
   if (gameState.turnIndex === 0) {
     gameState.round += 1;
+  }
+
+  // Skip disconnected players
+  let _skipSafety = 0;
+  while (room.players[gameState.turnIndex] && room.players[gameState.turnIndex].disconnected && _skipSafety < room.players.length) {
+    gameState.turnIndex = (gameState.turnIndex + 1) % room.players.length;
+    if (gameState.turnIndex === 0) {
+      gameState.round += 1;
+    }
+    _skipSafety++;
   }
 
   // Check if game over (max rounds reached)
@@ -956,19 +968,31 @@ async function endGame(room) {
 }
 
 // End game due to disconnect
-function endGameDueToDisconnect(room) {
+async function endGameDueToDisconnect(room) {
   room.status = 'finished';
 
-  // Whoever is left wins by default
-  const remaining = room.players;
-  const winner = remaining.length > 0 ? remaining[0] : null;
+  const stillConnected = room.players.filter(p => !p.disconnected);
+  const winner = stillConnected.length > 0 ? stillConnected[0] : (room.players.length > 0 ? room.players[0] : null);
 
-  const ranking = remaining.map((p, idx) => ({
+  // Award win + rating to the surviving player
+  if (winner) {
+    try {
+      await dbRun(
+        `UPDATE users SET rating = rating + 50, wins = wins + 1, territories_conquered = territories_conquered + ? WHERE id = ?`,
+        [winner.territoriesCount, winner.userId]
+      );
+      winner.rating = (winner.rating || 1000) + 50;
+    } catch (e) {
+      console.error('Rating update error on disconnect win:', e);
+    }
+  }
+
+  const ranking = room.players.map(p => ({
     username: p.username,
     color: p.color,
     territoriesCount: p.territoriesCount,
     newRating: p.rating,
-    ratingChange: 0
+    ratingChange: (winner && p.userId === winner.userId) ? 50 : 0
   }));
 
   io.to(room.code).emit('game-over', {

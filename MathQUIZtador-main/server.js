@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
 const path = require('path');
@@ -45,30 +45,23 @@ if (!fs.existsSync(path.join(__dirname, 'database'))) {
 
 // Database Setup
 const dbPath = path.join(__dirname, 'database', 'database.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error connecting to SQLite database:', err.message);
-  } else {
-    console.log('Connected to SQLite database at:', dbPath);
-    initializeDatabase();
-  }
-});
+const db = new Database(dbPath);
+console.log('Connected to SQLite database at:', dbPath);
+initializeDatabase();
 
 function initializeDatabase() {
-  db.serialize(() => {
-    db.run(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        wins INTEGER DEFAULT 0,
-        losses INTEGER DEFAULT 0,
-        rating INTEGER DEFAULT 1000,
-        territories_conquered INTEGER DEFAULT 0
-      )
-    `);
-  });
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      wins INTEGER DEFAULT 0,
+      losses INTEGER DEFAULT 0,
+      rating INTEGER DEFAULT 1000,
+      territories_conquered INTEGER DEFAULT 0
+    )
+  `);
 }
 
 // Session configuration
@@ -101,33 +94,10 @@ io.use((socket, next) => {
   next();
 });
 
-// Helper functions for DB queries (using Promises)
-const dbGet = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) reject(err);
-      else resolve(row);
-    });
-  });
-};
-
-const dbRun = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
-      if (err) reject(err);
-      else resolve(this);
-    });
-  });
-};
-
-const dbAll = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-  });
-};
+// Helper functions for DB queries (synchronous with better-sqlite3)
+const dbGet = (sql, params = []) => db.prepare(sql).get(...params);
+const dbRun = (sql, params = []) => db.prepare(sql).run(...params);
+const dbAll = (sql, params = []) => db.prepare(sql).all(...params);
 
 // Authentication Routes
 app.post('/api/register', async (req, res) => {
@@ -786,21 +756,22 @@ function joinRoomHelper(socket, roomCode) {
     territoriesCount: 0
   };
 
-  db.get('SELECT rating FROM users WHERE id = ?', [authUserId], (err, row) => {
-    if (!err && row) {
-      playerObj.rating = row.rating;
-    }
-    
-    room.players.push(playerObj);
-    socket.join(roomCode);
-    socket.currentRoom = roomCode;
-    
-    io.to(roomCode).emit('lobby-update', {
-      players: room.players,
-      host: room.host,
-      mode: room.mode,
-      roomCode: roomCode
-    });
+  try {
+    const row = db.prepare('SELECT rating FROM users WHERE id = ?').get(authUserId);
+    if (row) playerObj.rating = row.rating;
+  } catch (e) {
+    console.error('Rating fetch error:', e);
+  }
+
+  room.players.push(playerObj);
+  socket.join(roomCode);
+  socket.currentRoom = roomCode;
+
+  io.to(roomCode).emit('lobby-update', {
+    players: room.players,
+    host: room.host,
+    mode: room.mode,
+    roomCode: roomCode
   });
 }
 

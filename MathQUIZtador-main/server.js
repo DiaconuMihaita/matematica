@@ -15,7 +15,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   pingInterval: 25000,
-  pingTimeout: 20000,
+  pingTimeout: 60000, // tolerează blocaje scurte (tab în fundal) fără a deconecta
   cors: {
     origin: true,
     methods: ["GET", "POST"],

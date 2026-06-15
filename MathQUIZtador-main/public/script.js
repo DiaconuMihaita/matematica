@@ -5,7 +5,13 @@ const BACKEND_URL = window.location.hostname === 'localhost' || window.location.
 const _storedToken = localStorage.getItem('socketToken');
 const socket = io(BACKEND_URL, {
   withCredentials: true,
-  auth: _storedToken ? { token: _storedToken } : {}
+  auth: _storedToken ? { token: _storedToken } : {},
+  // Reconectare robustă — un blip de rețea nu te scoate din joc
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 500,
+  reconnectionDelayMax: 3000,
+  timeout: 20000
 });
 
 // Harta Romaniei: path-urile reale ale judetelor sunt incarcate din romania-map.js (window.ROMANIA_MAP)
@@ -429,7 +435,7 @@ if (isGamePage) {
     resultPopup.classList.add('hidden');
     gameoverOverlay.classList.remove('hidden');
     gameWinnerName.textContent = disconnected ? "Deconectat" : winnerUsername;
-    if (disconnected && message) alert(message);
+    if (disconnected && message) showToast(message);
     gameoverRankingBody.innerHTML = '';
     ranking.forEach((p, i) => {
       const tr = document.createElement('tr');
@@ -442,7 +448,8 @@ if (isGamePage) {
   });
 
   socket.on('player-disconnected', ({username}) => showToast(`${username} s-a deconectat. Se așteaptă reconectarea (max 60s)...`));
-  socket.on('error-msg', msg => alert(msg));
+  socket.on('player-reconnected', ({username}) => showToast(`${username} s-a reconectat. Jocul continuă!`));
+  socket.on('error-msg', msg => showToast(msg));
   backToLobbyBtn.addEventListener('click', () => { window.location.href = 'index.html'; });
 
   // SCOREBOARD

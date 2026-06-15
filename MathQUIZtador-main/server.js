@@ -1007,6 +1007,15 @@ async function endGameDueToDisconnect(room) {
   }, 30000);
 }
 
+// Plasă de siguranță: o eroare neașteptată dintr-un handler NU mai oprește
+// serverul (altfel toți jucătorii s-ar deconecta instant).
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException] Serverul a prins o eroare dar continuă:', err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection]', reason);
+});
+
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

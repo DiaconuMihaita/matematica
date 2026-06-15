@@ -6,6 +6,9 @@ const _storedToken = localStorage.getItem('socketToken');
 const socket = io(BACKEND_URL, {
   withCredentials: true,
   auth: _storedToken ? { token: _storedToken } : {},
+  // WebSocket direct — evită upgrade-ul instabil polling->ws care cauza deconectări
+  transports: ['websocket'],
+  upgrade: false,
   // Reconectare robustă — un blip de rețea nu te scoate din joc
   reconnection: true,
   reconnectionAttempts: Infinity,

@@ -286,365 +286,483 @@ if (isIndexPage) {
 // GAME.HTML
 // ============================================================
 if (isGamePage) {
-  const currentRoundEl     = document.getElementById('current-round');
-  const turnBannerEl       = document.getElementById('turn-banner');
-  const gameRoomCodeEl     = document.getElementById('game-room-code');
-  const playersScoreboardEl= document.getElementById('players-scoreboard');
-  const svgMapWrapper      = document.getElementById('svg-map-wrapper');
-  const questionOverlay    = document.getElementById('question-overlay');
+  const currentRoundEl      = document.getElementById('current-round');
+  const turnBannerEl        = document.getElementById('turn-banner');
+  const gameRoomCodeEl      = document.getElementById('game-room-code');
+  const playersScoreboardEl = document.getElementById('players-scoreboard');
+  const svgMapWrapper       = document.getElementById('svg-map-wrapper');
+  const questionOverlay     = document.getElementById('question-overlay');
   const attackerAnnouncement= document.getElementById('attacker-announcement');
-  const questionTextVal    = document.getElementById('question-text-val');
-  const questionAnswersGrid= document.getElementById('question-answers-grid');
-  const questionCountdown  = document.getElementById('question-countdown');
-  const timerProgressCircle= document.getElementById('timer-progress-circle');
-  const timerProgressLine  = document.getElementById('timer-progress-line');
-  const resultPopup        = document.getElementById('result-popup');
-  const resultStatusTitle  = document.getElementById('result-status-title');
-  const resultDetails      = document.getElementById('result-details');
-  const gameoverOverlay    = document.getElementById('gameover-overlay');
-  const gameWinnerName     = document.getElementById('game-winner-name');
-  const gameoverRankingBody= document.getElementById('gameover-ranking-body');
-  const backToLobbyBtn     = document.getElementById('back-to-lobby-btn');
+  const questionTextVal     = document.getElementById('question-text-val');
+  const questionAnswersGrid = document.getElementById('question-answers-grid');
+  const questionCountdown   = document.getElementById('question-countdown');
+  const questionTag         = document.getElementById('question-tag');
+  const timerProgressCircle = document.getElementById('timer-progress-circle');
+  const timerProgressLine   = document.getElementById('timer-progress-line');
+  const resultPopup         = document.getElementById('result-popup');
+  const resultStatusTitle   = document.getElementById('result-status-title');
+  const resultDetails       = document.getElementById('result-details');
+  const gameoverOverlay     = document.getElementById('gameover-overlay');
+  const gameWinnerName      = document.getElementById('game-winner-name');
+  const gameoverRankingBody = document.getElementById('gameover-ranking-body');
+  const backToLobbyBtn      = document.getElementById('back-to-lobby-btn');
 
-  // Rejoin with retry — tolerates the brief race after page navigation
-  let rejoinAttempts = 0;
+  // Path-urile reale ale județelor
+  const REAL_PATHS = {};
+  let MAP_VIEWBOX = '0 0 613 433';
+  if (window.ROMANIA_MAP && window.ROMANIA_MAP.locations) {
+    MAP_VIEWBOX = window.ROMANIA_MAP.viewBox || MAP_VIEWBOX;
+    window.ROMANIA_MAP.locations.forEach(l => { REAL_PATHS[l.id] = l.path; });
+  }
+  const ABBR_ALIAS = { mj: 'mh' };
+
+  // Input numeric pentru departajări (creat o singură dată)
+  let numericWrap = document.getElementById('numeric-answer-wrap');
+  if (!numericWrap) {
+    numericWrap = document.createElement('div');
+    numericWrap.id = 'numeric-answer-wrap';
+    numericWrap.className = 'hidden';
+    numericWrap.style.cssText = 'display:flex;gap:.75rem;margin-bottom:1.5rem;';
+    numericWrap.innerHTML =
+      '<input id="numeric-answer-input" type="number" step="any" placeholder="Scrie un număr..." ' +
+      'style="flex:1;padding:1rem;background:rgba(0,0,0,.3);border:1px solid var(--border-color);border-radius:12px;color:#fff;font-size:1.2rem;font-family:var(--font-title);" />' +
+      '<button id="numeric-answer-btn" class="btn btn-primary">Trimite</button>';
+    questionAnswersGrid.parentNode.insertBefore(numericWrap, questionAnswersGrid.nextSibling);
+  }
+  const numericInput = document.getElementById('numeric-answer-input');
+  const numericBtn   = document.getElementById('numeric-answer-btn');
+
+  let questionTimerInterval = null;
   let gameEntered = false;
+  let rejoinAttempts = 0;
+
+  // ---- REJOIN ----
   function tryRejoin() { socket.emit('rejoin-game'); }
-
   tryRejoin();
-  // Re-emit on every (re)connect so a dropped socket auto-recovers
-  socket.on('connect', () => { if (!gameEntered) tryRejoin(); else socket.emit('rejoin-game'); });
-
+  socket.on('connect', () => { socket.emit('rejoin-game'); });
   socket.on('rejoin-failed', () => {
     rejoinAttempts++;
-    if (rejoinAttempts < 5) {
-      setTimeout(tryRejoin, 700); // server may not have processed the new socket yet
-    } else {
-      window.location.href = 'index.html';
-    }
+    if (rejoinAttempts < 6) setTimeout(tryRejoin, 700);
+    else window.location.href = 'index.html';
   });
 
-  // SELECTION PHASE
-  socket.on('selection-phase', (state) => {
-    gameEntered = true; rejoinAttempts = 0;
-    isSelectionPhase = true;
-    activeGameState = state;
-    if (state.code) gameRoomCodeEl.textContent = state.code;
-    currentRoundEl.textContent = 'ALEGERE START';
-    updateSelectionBanner(state.players, state.selectionTurnIndex);
-    renderScoreboard(state.players, state.selectionTurnIndex);
-    renderSvgMap(state.map, state.players, true, state.selectionTurnIndex);
-  });
-
-  socket.on('selection-update', ({map, players, selectionTurnIndex}) => {
-    activeGameState.map = map;
-    activeGameState.players = players;
-    activeGameState.selectionTurnIndex = selectionTurnIndex;
-    updateSelectionBanner(players, selectionTurnIndex);
-    renderScoreboard(players, selectionTurnIndex);
-    renderSvgMap(map, players, true, selectionTurnIndex);
-  });
-
-  function updateSelectionBanner(players, idx) {
-    const sel = players[idx];
-    const isMe = sel.socketId === socket.id;
-    turnBannerEl.style.border = `1px solid ${sel.color}`;
-    turnBannerEl.style.color = sel.color;
-    turnBannerEl.textContent = isMe
-      ? 'ALEGE JUDETUL TAU DE START — click pe orice judet liber!'
-      : `${sel.username} alege judetul de start...`;
+  // ==========================================================
+  // RENDER
+  // ==========================================================
+  function setBanner(text, color) {
+    turnBannerEl.style.backgroundColor = 'rgba(0,0,0,0.4)';
+    turnBannerEl.style.border = `1px solid ${color || 'var(--neon-blue)'}`;
+    turnBannerEl.style.color = color || 'var(--text-main)';
+    turnBannerEl.textContent = text;
   }
 
-  // GAME STARTED
-  socket.on('game-started', (state) => {
-    gameEntered = true; rejoinAttempts = 0;
-    isSelectionPhase = false;
-    activeGameState = state;
-    if (state.code) gameRoomCodeEl.textContent = state.code;
-    currentRoundEl.textContent = `${state.round}/${state.maxRounds}`;
-    renderScoreboard(state.players, state.turnIndex);
-    renderSvgMap(state.map, state.players, false, state.turnIndex);
-    updateTurnBanner();
-  });
-
-  socket.on('game-state-sync', (state) => {
-    gameEntered = true; rejoinAttempts = 0;
-    isSelectionPhase = false;
-    activeGameState = state;
-    gameRoomCodeEl.textContent = state.code;
-    currentRoundEl.textContent = `${state.round}/${state.maxRounds}`;
-    renderScoreboard(state.players, state.turnIndex);
-    renderSvgMap(state.map, state.players, false, state.turnIndex);
-    updateTurnBanner();
-    if (state.activeAttack) showQuestionDuel(state.activeAttack);
-  });
-
-  socket.on('new-turn', ({turnIndex, round}) => {
-    if (!activeGameState) return;
-    questionOverlay.classList.add('hidden');
-    clearInterval(questionTimerInterval);
-    activeGameState.turnIndex = turnIndex;
-    activeGameState.round = round;
-    currentRoundEl.textContent = `${round}/${activeGameState.maxRounds}`;
-    renderScoreboard(activeGameState.players, turnIndex);
-    updateTurnBanner();
-    renderSvgMap(activeGameState.map, activeGameState.players, false, turnIndex);
-  });
-
-  socket.on('question-broadcast', attackInfo => showQuestionDuel(attackInfo));
-
-  socket.on('answer-registered', () => {
-    questionAnswersGrid.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
-  });
-
-  socket.on('answer-result', ({winnerId, winnerUsername, correctIndex, targetId, newOwnerColor, players}) => {
-    clearInterval(questionTimerInterval);
-    if (activeGameState) {
-      activeGameState.players = players;
-      const t = activeGameState.map.find(t => t.id === targetId);
-      if (t) { t.owner = winnerId; t.color = newOwnerColor; }
-    }
-    const btns = questionAnswersGrid.querySelectorAll('.answer-btn');
-    btns.forEach((btn, idx) => {
-      btn.disabled = true;
-      if (idx === correctIndex) btn.classList.add('correct');
-      else if (btn.classList.contains('selected')) btn.classList.add('incorrect');
-    });
-    setTimeout(() => {
-      questionOverlay.classList.add('hidden');
-      resultPopup.classList.remove('hidden');
-      const territory = activeGameState && activeGameState.map.find(t => t.id === targetId);
-      if (winnerId) {
-        const wp = players.find(p => p.socketId === winnerId);
-        resultStatusTitle.textContent = "JUDET CUCERIT!";
-        resultDetails.innerHTML = `<span style="color:${wp ? wp.color : '#fff'};font-weight:bold;">${winnerUsername}</span> a cucerit <strong>${territory ? territory.name : 'judetul'}</strong>!`;
-      } else {
-        resultStatusTitle.textContent = "TIMP EXPIRAT";
-        resultDetails.innerHTML = "Niciun raspuns corect. Judetul ramane neschimbat!";
-      }
-      setTimeout(() => {
-        resultPopup.classList.add('hidden');
-        if (activeGameState) {
-          renderScoreboard(activeGameState.players, activeGameState.turnIndex);
-          renderSvgMap(activeGameState.map, activeGameState.players, false, activeGameState.turnIndex);
-        }
-      }, 3500);
-    }, 1200);
-  });
-
-  socket.on('game-over', ({ranking, winnerUsername, disconnected, message}) => {
-    clearInterval(questionTimerInterval);
-    questionOverlay.classList.add('hidden');
-    resultPopup.classList.add('hidden');
-    gameoverOverlay.classList.remove('hidden');
-    gameWinnerName.textContent = disconnected ? "Deconectat" : winnerUsername;
-    if (disconnected && message) showToast(message);
-    gameoverRankingBody.innerHTML = '';
-    ranking.forEach((p, i) => {
-      const tr = document.createElement('tr');
-      let cls = 'neutral', sign = '0';
-      if (p.ratingChange > 0) { cls = 'positive'; sign = `+${p.ratingChange}`; }
-      else if (p.ratingChange < 0) { cls = 'negative'; sign = String(p.ratingChange); }
-      tr.innerHTML = `<td>${i+1}</td><td><span style="color:${p.color};font-weight:bold">${p.username}</span></td><td><strong>${p.territoriesCount}</strong></td><td>${p.newRating}</td><td><span class="rating-change-val ${cls}">${sign}</span></td>`;
-      gameoverRankingBody.appendChild(tr);
-    });
-  });
-
-  socket.on('player-disconnected', ({username}) => showToast(`${username} s-a deconectat. Se așteaptă reconectarea (max 60s)...`));
-  socket.on('player-reconnected', ({username}) => showToast(`${username} s-a reconectat. Jocul continuă!`));
-  socket.on('error-msg', msg => showToast(msg));
-  backToLobbyBtn.addEventListener('click', () => { window.location.href = 'index.html'; });
-
-  // SCOREBOARD
-  function renderScoreboard(players, turnIndex) {
-    if (!players) return;
+  function renderScoreboard() {
+    const gs = activeGameState; if (!gs || !gs.players) return;
     playersScoreboardEl.innerHTML = '';
-    const active = players[turnIndex];
-    players.forEach(p => {
-      const isMyTurn = active && p.socketId === active.socketId;
+    gs.players.forEach(p => {
+      const isActive = p.socketId === gs.activeSocketId;
       const isMe = p.socketId === socket.id;
       const card = document.createElement('div');
-      card.className = `scoreboard-player-card ${isMyTurn ? 'active-turn' : ''}`;
-      if (isMyTurn) card.style.color = p.color;
+      card.className = `scoreboard-player-card ${isActive ? 'active-turn' : ''}`;
+      if (isActive) card.style.color = p.color;
       card.innerHTML = `
         <div class="player-meta">
           <div class="player-color-dot" style="color:${p.color};background-color:${p.color}"></div>
           <div>
-            <div class="player-name">${p.username}${isMe ? ' (Tu)' : ''}</div>
+            <div class="player-name">${p.username}${isMe ? ' (Tu)' : ''}${p.disconnected ? ' ⏳' : ''}</div>
             <div class="player-rating-lbl">Rating: ${p.rating}</div>
           </div>
         </div>
         <div class="player-score">
           <span class="count">${p.territoriesCount}</span>
-          <span class="label">Judete</span>
+          <span class="label">Județe</span>
         </div>`;
       playersScoreboardEl.appendChild(card);
     });
   }
 
-  function updateTurnBanner() {
-    if (!activeGameState) return;
-    const active = activeGameState.players[activeGameState.turnIndex];
-    const isMe = active.socketId === socket.id;
-    turnBannerEl.style.backgroundColor = 'rgba(0,0,0,0.4)';
-    turnBannerEl.style.border = `1px solid ${active.color}`;
-    turnBannerEl.style.color = active.color;
-    turnBannerEl.textContent = isMe
-      ? 'ESTE RANDUL TAU — selecteaza un judet vecin pentru a ataca!'
-      : `Randul lui ${active.username} sa atace...`;
-  }
-
-  // SVG MAP cu poligoane reale
-  // Lookup real county SVG paths by id (ro-ab, ro-ag, ...)
-  const REAL_PATHS = {};
-  let MAP_VIEWBOX = "0 0 613 433";
-  if (window.ROMANIA_MAP && window.ROMANIA_MAP.locations) {
-    MAP_VIEWBOX = window.ROMANIA_MAP.viewBox || MAP_VIEWBOX;
-    window.ROMANIA_MAP.locations.forEach(loc => { REAL_PATHS[loc.id] = loc.path; });
-  }
-
-  function renderSvgMap(map, players, selectionMode, activeTurnIndex) {
+  // clickableIds: array; styleClass: 'is-selectable'|'is-attackable'; clickFn(id)
+  function renderMap(clickableIds, styleClass, clickFn) {
+    const gs = activeGameState; if (!gs || !gs.map) return;
+    clickableIds = clickableIds || [];
     svgMapWrapper.innerHTML = '';
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("viewBox", MAP_VIEWBOX);
-    svg.setAttribute("class", "game-map-svg");
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', MAP_VIEWBOX);
+    svg.setAttribute('class', 'game-map-svg');
+    const pathEls = [];
 
-    const activePlayer = players && players[activeTurnIndex];
-    const attackableIds = new Set();
-
-    if (!selectionMode && activePlayer && activePlayer.socketId === socket.id) {
-      const myIds = map.filter(t => t.owner === socket.id).map(t => t.id);
-      myIds.forEach(id => {
-        (adjacencyList[id] || []).forEach(nId => {
-          const n = map.find(t => t.id === nId);
-          if (n && n.owner !== socket.id) attackableIds.add(nId);
-        });
-      });
-    }
-
-    const pathEls = []; // for label placement after DOM insertion
-
-    // Aliasuri pentru abrevieri vechi/variante (ex: backend mai vechi trimitea "MJ" pentru Mehedinți)
-    const ABBR_ALIAS = { mj: 'mh', buc: 'b', b: 'b' };
-
-    map.forEach(node => {
+    gs.map.forEach(node => {
       let key = (node.abbr || '').toLowerCase();
       let d = REAL_PATHS['ro-' + key];
       if (!d && ABBR_ALIAS[key]) d = REAL_PATHS['ro-' + ABBR_ALIAS[key]];
-      // ultim resort: caută după nume (Mehedinți etc.)
       if (!d && node.name && window.ROMANIA_MAP) {
-        const byName = window.ROMANIA_MAP.locations.find(l => l.name && l.name.toLowerCase() === node.name.toLowerCase());
-        if (byName) d = byName.path;
+        const bn = window.ROMANIA_MAP.locations.find(l => l.name && l.name.toLowerCase() === node.name.toLowerCase());
+        if (bn) d = bn.path;
       }
       if (!d) return;
-      const isOwnedByMe  = node.owner === socket.id;
-      const isAttackable = attackableIds.has(node.id);
-      const isSelectable = selectionMode && node.owner === null;
 
-      const g = document.createElementNS(svgNS, "g");
-      g.setAttribute("class", "svg-county-group");
-      g.setAttribute("id", `county-${node.id}`);
-
-      const path = document.createElementNS(svgNS, "path");
-      path.setAttribute("d", d);
-      path.setAttribute("class", "svg-county-poly");
+      const isMine = node.owner === socket.id;
+      const clickable = clickableIds.indexOf(node.id) !== -1;
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('class', 'svg-county-group');
+      g.setAttribute('id', `county-${node.id}`);
+      const path = document.createElementNS(NS, 'path');
+      path.setAttribute('d', d);
+      path.setAttribute('class', 'svg-county-poly');
       path.style.fill = node.color || '#2d3561';
-      if (isOwnedByMe)  path.classList.add('my-county');
-      if (isAttackable) path.classList.add('is-attackable');
-      if (isSelectable) path.classList.add('is-selectable');
+      if (isMine) path.classList.add('my-county');
+      if (clickable) path.classList.add(styleClass || 'is-attackable');
       g.appendChild(path);
-
-      const title = document.createElementNS(svgNS, "title");
+      const title = document.createElementNS(NS, 'title');
       title.textContent = node.name;
       g.appendChild(title);
-
-      if ((selectionMode && isSelectable) || (!selectionMode && isAttackable)) {
+      if (clickable && clickFn) {
         g.style.cursor = 'pointer';
-        g.addEventListener('click', () => {
-          if (selectionMode) socket.emit('select-starting-territory', {territoryId: node.id});
-          else socket.emit('attack-territory', {targetId: node.id});
-        });
+        g.addEventListener('click', () => clickFn(node.id));
       }
-
       svg.appendChild(g);
       pathEls.push({ g, path, abbr: node.abbr });
     });
 
     svgMapWrapper.appendChild(svg);
-
-    // Place abbreviation labels at the bounding-box center of each county
     pathEls.forEach(({ g, path, abbr }) => {
-      let cx, cy;
-      try {
-        const bb = path.getBBox();
-        cx = bb.x + bb.width / 2;
-        cy = bb.y + bb.height / 2;
-      } catch (e) { return; }
-      const text = document.createElementNS(svgNS, "text");
-      text.setAttribute("x", cx);
-      text.setAttribute("y", cy);
-      text.setAttribute("class", "svg-county-text");
-      text.setAttribute("text-anchor", "middle");
-      text.setAttribute("dominant-baseline", "central");
-      text.textContent = abbr;
-      g.appendChild(text);
+      let bb; try { bb = path.getBBox(); } catch (e) { return; }
+      if (!bb.width || !bb.height) return;
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', bb.x + bb.width / 2);
+      t.setAttribute('y', bb.y + bb.height / 2);
+      t.setAttribute('class', 'svg-county-text');
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('dominant-baseline', 'central');
+      t.textContent = abbr;
+      g.appendChild(t);
     });
   }
 
-  // QUESTION DUEL
-  function showQuestionDuel(attackInfo) {
-    clearInterval(questionTimerInterval);
-    attackerAnnouncement.textContent = `${attackInfo.attackerUsername} ATACA!`;
-    questionTextVal.textContent = attackInfo.questionText;
-    questionAnswersGrid.innerHTML = '';
-    attackInfo.answers.forEach((ans, idx) => {
-      const btn = document.createElement('button');
-      btn.className = 'answer-btn';
-      btn.textContent = ans;
-      btn.addEventListener('click', () => {
-        questionAnswersGrid.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        socket.emit('submit-answer', {answerIndex: idx});
-      });
-      questionAnswersGrid.appendChild(btn);
-    });
-    if (attackInfo.hasAnswered) questionAnswersGrid.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
-    questionOverlay.classList.remove('hidden');
-    const duration = attackInfo.duration || 20000;
-    let timeLeftMs = attackInfo.timeRemaining !== undefined ? attackInfo.timeRemaining : duration;
-    updateTimerUI(timeLeftMs, duration);
+  // ==========================================================
+  // ÎNTREBĂRI (grilă + numeric)
+  // ==========================================================
+  function clearTimer() { if (questionTimerInterval) { clearInterval(questionTimerInterval); questionTimerInterval = null; } }
+
+  function startTimer(duration, timeRemaining) {
+    clearTimer();
+    let left = (timeRemaining !== undefined && timeRemaining !== null) ? timeRemaining : duration;
+    updateTimerUI(left, duration);
     questionTimerInterval = setInterval(() => {
-      timeLeftMs -= 100;
-      if (timeLeftMs <= 0) { timeLeftMs = 0; clearInterval(questionTimerInterval); }
-      updateTimerUI(timeLeftMs, duration);
+      left -= 100; if (left <= 0) { left = 0; clearTimer(); }
+      updateTimerUI(left, duration);
     }, 100);
   }
 
-  function updateTimerUI(timeLeftMs, duration) {
-    const sec = Math.ceil(timeLeftMs / 1000);
-    questionCountdown.textContent = sec;
-    const pct = (timeLeftMs / duration) * 100;
+  function updateTimerUI(left, duration) {
+    questionCountdown.textContent = Math.ceil(left / 1000);
+    const pct = (left / duration) * 100;
     if (timerProgressCircle) {
-      timerProgressCircle.setAttribute("stroke-dasharray", `${pct}, 100`);
-      timerProgressCircle.style.stroke = pct > 50 ? "var(--neon-blue)" : pct > 25 ? "var(--neon-yellow)" : "var(--neon-pink)";
+      timerProgressCircle.setAttribute('stroke-dasharray', `${pct}, 100`);
+      timerProgressCircle.style.stroke = pct > 50 ? 'var(--neon-blue)' : pct > 25 ? 'var(--neon-yellow)' : 'var(--neon-pink)';
     }
     if (timerProgressLine) {
-      timerProgressLine.style.transform = `scaleX(${pct/100})`;
-      timerProgressLine.style.background = pct <= 25 ? "var(--neon-pink)" : "linear-gradient(90deg,var(--neon-blue),var(--neon-pink))";
+      timerProgressLine.style.transform = `scaleX(${pct / 100})`;
+      timerProgressLine.style.background = pct <= 25 ? 'var(--neon-pink)' : 'linear-gradient(90deg,var(--neon-blue),var(--neon-pink))';
     }
   }
+
+  // info: {questionText, answers, duration, timeRemaining, announce, tag}
+  // opts: {participant, emitName, hasAnswered}
+  function showMC(info, opts) {
+    clearTimer();
+    questionTag.textContent = opts.tag || 'DUEL';
+    attackerAnnouncement.textContent = info.announce || '';
+    questionTextVal.textContent = info.questionText;
+    numericWrap.classList.add('hidden');
+    questionAnswersGrid.classList.remove('hidden');
+    questionAnswersGrid.innerHTML = '';
+    (info.answers || []).forEach((ans, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = ans;
+      if (!opts.participant || opts.hasAnswered) btn.disabled = true;
+      btn.addEventListener('click', () => {
+        questionAnswersGrid.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        questionAnswersGrid.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
+        socket.emit(opts.emitName, { answerIndex: idx });
+      });
+      questionAnswersGrid.appendChild(btn);
+    });
+    questionOverlay.classList.remove('hidden');
+    startTimer(info.duration || 20000, info.timeRemaining);
+  }
+
+  function showNumeric(info, opts) {
+    clearTimer();
+    questionTag.textContent = 'DEPARTAJARE';
+    attackerAnnouncement.textContent = info.announce || 'Întrebare de departajare — răspunde cu un număr!';
+    questionTextVal.textContent = info.questionText;
+    questionAnswersGrid.classList.add('hidden');
+    numericWrap.classList.remove('hidden');
+    numericInput.value = '';
+    const enabled = opts.participant && !opts.hasAnswered;
+    numericInput.disabled = !enabled;
+    numericBtn.disabled = !enabled;
+    numericBtn.onclick = () => {
+      if (numericInput.value === '') return;
+      numericInput.disabled = true; numericBtn.disabled = true;
+      socket.emit(opts.emitName, { value: Number(numericInput.value) });
+    };
+    questionOverlay.classList.remove('hidden');
+    if (enabled) setTimeout(() => numericInput.focus(), 100);
+    startTimer(info.duration || 20000, info.timeRemaining);
+  }
+
+  function hideQuestion() { clearTimer(); questionOverlay.classList.add('hidden'); }
+
+  function showResult(title, html, color) {
+    resultStatusTitle.textContent = title;
+    resultStatusTitle.style.color = color || 'var(--neon-yellow)';
+    resultDetails.innerHTML = html;
+    resultPopup.classList.remove('hidden');
+    setTimeout(() => resultPopup.classList.add('hidden'), 3600);
+  }
+
+  function nameOf(socketId) {
+    const p = activeGameState.players.find(x => x.socketId === socketId);
+    return p ? p.username : '?';
+  }
+  function colorOf(socketId) {
+    const p = activeGameState.players.find(x => x.socketId === socketId);
+    return p ? p.color : '#fff';
+  }
+
+  // ==========================================================
+  // FAZA 1 — SELECȚIE INIȚIALĂ
+  // ==========================================================
+  socket.on('selection-phase', (state) => {
+    gameEntered = true; rejoinAttempts = 0;
+    activeGameState = { phase: 'selecting', map: state.map, players: state.players,
+      activeSocketId: state.players[state.selectionTurnIndex].socketId };
+    if (state.code) gameRoomCodeEl.textContent = state.code;
+    currentRoundEl.textContent = 'ALEGERE START';
+    selectionRender(state.players[state.selectionTurnIndex].socketId);
+  });
+  socket.on('selection-update', ({ map, players, selectionTurnIndex }) => {
+    activeGameState.map = map; activeGameState.players = players;
+    activeGameState.activeSocketId = players[selectionTurnIndex].socketId;
+    selectionRender(players[selectionTurnIndex].socketId);
+  });
+  function selectionRender(activeSid) {
+    const isMe = activeSid === socket.id;
+    setBanner(isMe ? '🏠 ALEGE JUDEȚUL TĂU DE START — orice județ liber!' : `${nameOf(activeSid)} alege județul de start...`, colorOf(activeSid));
+    renderScoreboard();
+    const free = isMe ? activeGameState.map.filter(t => t.owner === null).map(t => t.id) : [];
+    renderMap(free, 'is-selectable', id => socket.emit('select-starting-territory', { territoryId: id }));
+  }
+
+  // ==========================================================
+  // FAZA 2 — DISTRIBUȚIE
+  // ==========================================================
+  socket.on('distribution-start', ({ map, players }) => {
+    gameEntered = true; rejoinAttempts = 0;
+    activeGameState = { phase: 'distribution', map, players, activeSocketId: null };
+    currentRoundEl.textContent = 'DISTRIBUȚIE';
+    setBanner('📦 Faza de distribuție — fiecare își extinde teritoriul!', 'var(--neon-yellow)');
+    renderScoreboard();
+    renderMap([], 'is-selectable', null);
+  });
+
+  socket.on('distribution-reserve-turn', ({ activeSocketId, activeUsername, reservableIds, map, players }) => {
+    activeGameState.map = map; activeGameState.players = players; activeGameState.activeSocketId = activeSocketId;
+    currentRoundEl.textContent = 'DISTRIBUȚIE';
+    const isMe = activeSocketId === socket.id;
+    setBanner(isMe ? '🎯 ALEGE un județ liber vecin teritoriului tău!' : `${activeUsername} își alege un județ...`, colorOf(activeSocketId));
+    renderScoreboard();
+    renderMap(isMe ? reservableIds : [], 'is-selectable', id => socket.emit('reserve-territory', { countyId: id }));
+  });
+
+  socket.on('distribution-question', (info) => {
+    activeGameState.map = info.map; activeGameState.players = info.players; activeGameState.activeSocketId = null;
+    renderScoreboard(); renderMap([], 'is-selectable', null);
+    const participant = info.reservations && (socket.id in info.reservations);
+    showMC({ questionText: info.questionText, answers: info.answers, duration: info.duration,
+      announce: participant ? '✏️ Răspunde corect ca să primești județul ales!' : 'Aștepți rezultatul... (nu ai rezervat un județ)',
+      tag: 'DISTRIBUȚIE' },
+      { participant, emitName: 'submit-distribution-answer' });
+  });
+
+  socket.on('distribution-result', ({ claims, map, players }) => {
+    hideQuestion();
+    activeGameState.map = map; activeGameState.players = players;
+    renderScoreboard(); renderMap([], 'is-selectable', null);
+    const ok = claims.filter(c => c.correct).map(c => nameOf(c.socketId));
+    const fail = claims.filter(c => !c.correct).map(c => nameOf(c.socketId));
+    let html = '';
+    if (ok.length) html += `<div>✅ Au primit județul: <b>${ok.join(', ')}</b></div>`;
+    if (fail.length) html += `<div style="margin-top:.4rem;opacity:.8">❌ Au ratat: ${fail.join(', ')}</div>`;
+    if (!html) html = 'Nimeni nu a primit județul în această rundă.';
+    showResult('REZULTAT DISTRIBUȚIE', html, 'var(--neon-green)');
+  });
+
+  socket.on('distribution-tiebreak-question', (info) => {
+    activeGameState.map = info.map; activeGameState.players = info.players; activeGameState.activeSocketId = null;
+    renderScoreboard(); renderMap([], 'is-selectable', null);
+    const participant = info.participants && info.participants.indexOf(socket.id) !== -1;
+    showNumeric({ questionText: info.questionText, duration: info.duration,
+      announce: '⚖️ Județe puține! Cel mai aproape de răspuns câștigă.' },
+      { participant, emitName: 'submit-distribution-tiebreak' });
+  });
+
+  socket.on('distribution-tiebreak-result', ({ correctAnswer, claims, map, players, ranking }) => {
+    hideQuestion();
+    activeGameState.map = map; activeGameState.players = players;
+    renderScoreboard(); renderMap([], 'is-selectable', null);
+    let html = `<div>Răspuns corect: <b>${correctAnswer}</b></div>`;
+    if (ranking && ranking.length) {
+      html += '<div style="margin-top:.4rem;font-size:.9rem">' +
+        ranking.map((r, i) => `${i + 1}. ${r.username} (${r.value === null ? '—' : r.value})`).join('<br>') + '</div>';
+    }
+    showResult('DEPARTAJARE', html, 'var(--neon-yellow)');
+  });
+
+  // ==========================================================
+  // FAZA 3 — BĂTĂLIE
+  // ==========================================================
+  socket.on('battle-start', ({ map, players, turnIndex, round, maxRounds, code }) => {
+    gameEntered = true; rejoinAttempts = 0;
+    activeGameState = { phase: 'battle', map, players, round, maxRounds, turnIndex,
+      activeSocketId: players[turnIndex] ? players[turnIndex].socketId : null };
+    if (code) gameRoomCodeEl.textContent = code;
+    currentRoundEl.textContent = `${round}/${maxRounds}`;
+    setBanner('⚔️ Începe BĂTĂLIA! Cucerește cât mai multe județe!', 'var(--neon-pink)');
+    renderScoreboard(); renderMap([], 'is-attackable', null);
+  });
+
+  socket.on('battle-turn', ({ turnIndex, round, maxRounds, activeSocketId, attackableIds, map, players }) => {
+    activeGameState.map = map; activeGameState.players = players;
+    activeGameState.round = round; activeGameState.maxRounds = maxRounds;
+    activeGameState.turnIndex = turnIndex; activeGameState.activeSocketId = activeSocketId;
+    currentRoundEl.textContent = `${round}/${maxRounds}`;
+    const isMe = activeSocketId === socket.id;
+    setBanner(isMe ? '⚔️ RÂNDUL TĂU — atacă un județ inamic vecin!' : `Rândul lui ${nameOf(activeSocketId)} să atace...`, colorOf(activeSocketId));
+    renderScoreboard();
+    renderMap(isMe ? attackableIds : [], 'is-attackable', id => socket.emit('attack-territory', { targetId: id }));
+  });
+
+  socket.on('battle-question', (info) => {
+    activeGameState.activeSocketId = null;
+    const participant = info.participants && info.participants.indexOf(socket.id) !== -1;
+    showMC({ questionText: info.questionText, answers: info.answers, duration: info.duration,
+      announce: `⚔️ ${info.attackerUsername} atacă ${info.defenderUsername}` + (participant ? '' : ' — spectezi duelul'),
+      tag: 'BĂTĂLIE' },
+      { participant, emitName: 'submit-battle-answer' });
+  });
+
+  socket.on('battle-tiebreak-question', (info) => {
+    const participant = info.participants && info.participants.indexOf(socket.id) !== -1;
+    showNumeric({ questionText: info.questionText, duration: info.duration,
+      announce: '⚖️ Amândoi corect! Departajare: cel mai aproape câștigă.' },
+      { participant, emitName: 'submit-battle-tiebreak' });
+  });
+
+  socket.on('battle-result', (res) => {
+    hideQuestion();
+    activeGameState.map = res.map; activeGameState.players = res.players;
+    renderScoreboard(); renderMap([], 'is-attackable', null);
+    const target = res.map.find(t => t.id === res.targetId);
+    const tName = target ? target.name : 'județul';
+    let html, title, color;
+    if (res.taken) {
+      title = 'JUDEȚ CUCERIT!'; color = 'var(--neon-green)';
+      html = `<span style="color:${colorOf(res.winnerId)};font-weight:bold">${res.winnerUsername}</span> a cucerit <b>${tName}</b>!`;
+    } else {
+      title = 'ATAC RESPINS'; color = 'var(--neon-pink)';
+      html = `<b>${tName}</b> rămâne la <span style="color:${colorOf(res.winnerId)};font-weight:bold">${res.winnerUsername}</span>.`;
+    }
+    if (res.tie) html += `<div style="margin-top:.4rem;font-size:.9rem;opacity:.85">Departajare — răspuns corect: <b>${res.correctAnswer}</b></div>`;
+    showResult(title, html, color);
+  });
+
+  // ==========================================================
+  // REJOIN SYNC
+  // ==========================================================
+  socket.on('game-state-sync', (s) => {
+    gameEntered = true; rejoinAttempts = 0;
+    activeGameState = { phase: s.phase, map: s.map, players: s.players,
+      round: s.round, maxRounds: s.maxRounds, turnIndex: s.turnIndex, activeSocketId: null };
+    if (s.code) gameRoomCodeEl.textContent = s.code;
+    currentRoundEl.textContent = s.phase === 'battle' ? `${s.round}/${s.maxRounds}` : (s.phase === 'distribution' ? 'DISTRIBUȚIE' : 'JOC');
+
+    const a = s.active;
+    if (!a) { setBanner('Se sincronizează...', 'var(--neon-blue)'); renderScoreboard(); renderMap([], 'is-attackable', null); return; }
+
+    if (a.kind === 'reserve') {
+      activeGameState.activeSocketId = a.activeSocketId;
+      const isMe = a.activeSocketId === socket.id;
+      setBanner(isMe ? '🎯 ALEGE un județ liber vecin!' : `${a.activeUsername} alege...`, colorOf(a.activeSocketId));
+      renderScoreboard();
+      renderMap(isMe ? a.reservableIds : [], 'is-selectable', id => socket.emit('reserve-territory', { countyId: id }));
+    } else if (a.kind === 'dist-question') {
+      renderScoreboard(); renderMap([], 'is-selectable', null);
+      showMC({ questionText: a.questionText, answers: a.answers, duration: a.duration, timeRemaining: a.timeRemaining,
+        announce: a.isParticipant ? '✏️ Răspunde corect!' : 'Spectezi...', tag: 'DISTRIBUȚIE' },
+        { participant: a.isParticipant, emitName: 'submit-distribution-answer', hasAnswered: a.hasAnswered });
+    } else if (a.kind === 'dist-tiebreak') {
+      renderScoreboard(); renderMap([], 'is-selectable', null);
+      showNumeric({ questionText: a.questionText, duration: a.duration, timeRemaining: a.timeRemaining },
+        { participant: a.isParticipant, emitName: 'submit-distribution-tiebreak', hasAnswered: a.hasAnswered });
+    } else if (a.kind === 'battle-turn') {
+      activeGameState.activeSocketId = a.activeSocketId;
+      const isMe = a.activeSocketId === socket.id;
+      setBanner(isMe ? '⚔️ RÂNDUL TĂU — atacă!' : `Rândul lui ${nameOf(a.activeSocketId)}...`, colorOf(a.activeSocketId));
+      renderScoreboard();
+      renderMap(isMe ? a.attackableIds : [], 'is-attackable', id => socket.emit('attack-territory', { targetId: id }));
+    } else if (a.kind === 'battle-question') {
+      renderScoreboard(); renderMap([], 'is-attackable', null);
+      showMC({ questionText: a.questionText, answers: a.answers, duration: a.duration, timeRemaining: a.timeRemaining,
+        announce: `⚔️ ${a.attackerUsername} atacă ${a.defenderUsername}`, tag: 'BĂTĂLIE' },
+        { participant: a.isParticipant, emitName: 'submit-battle-answer', hasAnswered: a.hasAnswered });
+    } else if (a.kind === 'battle-tiebreak') {
+      renderScoreboard(); renderMap([], 'is-attackable', null);
+      showNumeric({ questionText: a.questionText, duration: a.duration, timeRemaining: a.timeRemaining },
+        { participant: a.isParticipant, emitName: 'submit-battle-tiebreak', hasAnswered: a.hasAnswered });
+    }
+  });
+
+  // ---- diverse ----
+  socket.on('answer-registered', () => {});
+
+  socket.on('game-over', ({ ranking, winnerUsername, disconnected, message }) => {
+    clearTimer(); hideQuestion(); resultPopup.classList.add('hidden');
+    gameoverOverlay.classList.remove('hidden');
+    gameWinnerName.textContent = disconnected ? 'Deconectat' : winnerUsername;
+    if (disconnected && message) showToast(message);
+    gameoverRankingBody.innerHTML = '';
+    (ranking || []).forEach((p, i) => {
+      const tr = document.createElement('tr');
+      let cls = 'neutral', sign = '0';
+      if (p.ratingChange > 0) { cls = 'positive'; sign = `+${p.ratingChange}`; }
+      else if (p.ratingChange < 0) { cls = 'negative'; sign = String(p.ratingChange); }
+      tr.innerHTML = `<td>${i + 1}</td><td><span style="color:${p.color};font-weight:bold">${p.username}</span></td><td><strong>${p.territoriesCount}</strong></td><td>${p.newRating}</td><td><span class="rating-change-val ${cls}">${sign}</span></td>`;
+      gameoverRankingBody.appendChild(tr);
+    });
+  });
+
+  socket.on('player-disconnected', ({ username }) => showToast(`${username} s-a deconectat. Așteptare reconectare (max 60s)...`));
+  socket.on('player-reconnected', ({ username }) => showToast(`${username} s-a reconectat. Jocul continuă!`));
+  socket.on('error-msg', (msg) => showToast(msg));
+  backToLobbyBtn.addEventListener('click', () => { window.location.href = 'index.html'; });
 
   function showToast(msg) {
     let t = document.getElementById('game-toast');
     if (!t) {
       t = document.createElement('div');
       t.id = 'game-toast';
-      t.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(255,234,0,.15);border:1px solid var(--neon-yellow);color:var(--neon-yellow);padding:12px 24px;border-radius:8px;z-index:200;font-family:var(--font-title);font-size:.9rem;';
+      t.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(255,234,0,.15);border:1px solid var(--neon-yellow);color:var(--neon-yellow);padding:12px 24px;border-radius:8px;z-index:200;font-family:var(--font-title);font-size:.9rem;text-align:center;max-width:90%;';
       document.body.appendChild(t);
     }
     t.textContent = msg;
     t.style.display = 'block';
-    setTimeout(() => { t.style.display = 'none'; }, 6000);
+    clearTimeout(t._h);
+    t._h = setTimeout(() => { t.style.display = 'none'; }, 5500);
   }
 }

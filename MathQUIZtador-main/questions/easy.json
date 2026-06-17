@@ -1,62 +1,1322 @@
 [
-  {
-    "id": 1,
-    "question": "Calculați derivata funcției f(x) = x².",
-    "answers": ["2x", "x", "x²", "4x"],
-    "correct": 0
-  },
-  {
-    "id": 2,
-    "question": "Cât este limita: lim (x -> 2) (3x - 1)?",
-    "answers": ["5", "6", "2", "0"],
-    "correct": 0
-  },
-  {
-    "id": 3,
-    "question": "Determinantul matricei unitate I₂ = [[1, 0], [0, 1]] este:",
-    "answers": ["1", "0", "2", "-1"],
-    "correct": 0
-  },
-  {
-    "id": 4,
-    "question": "Valoarea ln(1) este egală cu:",
-    "answers": ["0", "1", "e", "-1"],
-    "correct": 0
-  },
-  {
-    "id": 5,
-    "question": "Transpusa matricei A = [[1, 2], [3, 4]] este:",
-    "answers": ["[[1, 3], [2, 4]]", "[[4, 2], [3, 1]]", "[[2, 1], [4, 3]]", "[[3, 4], [1, 2]]"],
-    "correct": 0
-  },
-  {
-    "id": 6,
-    "question": "Calculați derivata funcției f(x) = e^x.",
-    "answers": ["e^x", "x * e^(x-1)", "ln(x)", "e"],
-    "correct": 0
-  },
-  {
-    "id": 7,
-    "question": "O matrice pătratică A este inversabilă dacă și numai dacă:",
-    "answers": ["det(A) ≠ 0", "det(A) = 0", "A = I_n", "A are elemente pozitive"],
-    "correct": 0
-  },
-  {
-    "id": 8,
-    "question": "Calculați limita: lim (x -> ∞) (1 / x).",
-    "answers": ["0", "∞", "1", "-∞"],
-    "correct": 0
-  },
-  {
-    "id": 9,
-    "question": "Dacă A este o matrice 1x2 și B este 2x1, ce dimensiune are produsul A * B?",
-    "answers": ["1x1", "2x2", "1x2", "2x1"],
-    "correct": 0
-  },
-  {
-    "id": 10,
-    "question": "Calculați derivata funcției f(x) = sin(x).",
-    "answers": ["cos(x)", "-cos(x)", "sin(x)", "-sin(x)"],
-    "correct": 0
-  }
+ {
+  "id": 1,
+  "question": "Valoarea $\\ln 1$ este:",
+  "answers": [
+   "$0$",
+   "$e$",
+   "$-1$",
+   "$1$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 2,
+  "question": "Valoarea lui $e^0$ este:",
+  "answers": [
+   "$0$",
+   "$1$",
+   "$e$",
+   "$-1$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 3,
+  "question": "Derivata funcției $f(x) = \\sin x$ este:",
+  "answers": [
+   "$\\cos x$",
+   "$-\\cos x$",
+   "$\\sin x$",
+   "$-\\sin x$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 4,
+  "question": "Derivata funcției $f(x) = \\cos x$ este:",
+  "answers": [
+   "$\\sin x$",
+   "$-\\cos x$",
+   "$-\\sin x$",
+   "$\\cos x$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 5,
+  "question": "Derivata funcției $f(x) = e^x$ este:",
+  "answers": [
+   "$e^x$",
+   "$e^{x-1}$",
+   "$x e^{x-1}$",
+   "$1$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 6,
+  "question": "Derivata funcției $f(x) = \\ln x$ este:",
+  "answers": [
+   "$\\ln x$",
+   "$x$",
+   "$-\\dfrac{1}{x^2}$",
+   "$\\dfrac{1}{x}$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 7,
+  "question": "Derivata funcției $f(x) = \\sqrt{x}$ este:",
+  "answers": [
+   "$\\dfrac{1}{2\\sqrt{x}}$",
+   "$2\\sqrt{x}$",
+   "$\\dfrac{1}{\\sqrt{x}}$",
+   "$\\sqrt{x}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 8,
+  "question": "Valoarea $\\log_{10} 100$ este:",
+  "answers": [
+   "$10$",
+   "$2$",
+   "$100$",
+   "$1$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 9,
+  "question": "Derivata funcției $f(x) = \\dfrac{1}{x}$ este:",
+  "answers": [
+   "$-\\dfrac{1}{x^2}$",
+   "$\\dfrac{1}{x^2}$",
+   "$\\ln x$",
+   "$-\\dfrac{1}{x}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 10,
+  "question": "Calculați derivata funcției $f(x) = 4x^{3}$.",
+  "answers": [
+   "$3x^{2}$",
+   "$12x^{2}$",
+   "$4x^{2}$",
+   "$12x^{3}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 11,
+  "question": "Calculați derivata funcției $f(x) = -4x^{3} + 2x^{2} - 2x - 5$.",
+  "answers": [
+   "$-12x^{2} + 4x - 2$",
+   "$-12x^{3} + 4x^{2} - 2x$",
+   "$-11x^{2} + 4x - 2$",
+   "$-4x^{3} + 2x^{2} - 2x$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 12,
+  "question": "Calculați $f'(x)$ pentru $f(x) = x^{9}$.",
+  "answers": [
+   "$10x^{9}$",
+   "$9x^{8}$",
+   "$8x^{8}$",
+   "$9x^{9}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 13,
+  "question": "Determinantul matricei $\\begin{pmatrix} -1 & -6 \\\\ 0 & 5 \\end{pmatrix}$ este:",
+  "answers": [
+   "$5$",
+   "$-7$",
+   "$-4$",
+   "$-5$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 14,
+  "question": "Cât este $\\lim_{x \\to 4} (4x - 2)$?",
+  "answers": [
+   "$13$",
+   "$2$",
+   "$14$",
+   "$16$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 15,
+  "question": "Cât este $\\lim_{x \\to 3} (2x - 5)$?",
+  "answers": [
+   "$1$",
+   "$-1$",
+   "$6$",
+   "$-3$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 16,
+  "question": "Determinantul matricei $\\begin{pmatrix} -5 & 3 \\\\ 2 & 6 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-35$",
+   "$-24$",
+   "$-39$",
+   "$-36$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 17,
+  "question": "Cât este $\\lim_{x \\to -2} (3x - 6)$?",
+  "answers": [
+   "$-12$",
+   "$-6$",
+   "$-10$",
+   "$-3$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 18,
+  "question": "Determinantul matricei $\\begin{pmatrix} 4 & -1 \\\\ 4 & 6 \\end{pmatrix}$ este:",
+  "answers": [
+   "$30$",
+   "$20$",
+   "$26$",
+   "$28$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 19,
+  "question": "Calculați derivata funcției $f(x) = -5x^{3} - x^{2} - 3x$.",
+  "answers": [
+   "$-14x^{2} - 2x - 3$",
+   "$-15x^{2} - 2x - 3$",
+   "$-15x^{3} - 2x^{2} - 3x$",
+   "$-5x^{3} - x^{2} - 3x$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 20,
+  "question": "Calculați derivata funcției $f(x) = -3x^{3} + x^{2} - 2x + 3$.",
+  "answers": [
+   "$-9x^{3} + 2x^{2} - 2x$",
+   "$-3x^{3} + x^{2} - 2x$",
+   "$-8x^{2} + 2x - 2$",
+   "$-9x^{2} + 2x - 2$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 21,
+  "question": "Calculați derivata funcției $f(x) = 6x^{5}$.",
+  "answers": [
+   "$5x^{4}$",
+   "$30x^{4}$",
+   "$6x^{4}$",
+   "$24x^{4}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 22,
+  "question": "Calculați derivata funcției $f(x) = 6x^{3}$.",
+  "answers": [
+   "$6x^{2}$",
+   "$12x^{2}$",
+   "$18x^{2}$",
+   "$3x^{2}$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 23,
+  "question": "Calculați $f'(x)$ pentru $f(x) = x^{6}$.",
+  "answers": [
+   "$7x^{6}$",
+   "$6x^{5}$",
+   "$x^{5}$",
+   "$6x^{6}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 24,
+  "question": "Cât este $\\lim_{x \\to 2} (4x - 2)$?",
+  "answers": [
+   "$5$",
+   "$6$",
+   "$10$",
+   "$2$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 25,
+  "question": "Calculați derivata funcției $f(x) = x^{2} - 5x - 6$.",
+  "answers": [
+   "$3x - 5$",
+   "$2x^{2} - 5x$",
+   "$2x - 5$",
+   "$x^{2} - 5x$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 26,
+  "question": "Calculați derivata funcției $f(x) = 7x^{4}$.",
+  "answers": [
+   "$28x^{3}$",
+   "$4x^{3}$",
+   "$21x^{3}$",
+   "$7x^{3}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 27,
+  "question": "Calculați derivata funcției $f(x) = 7x^{5}$.",
+  "answers": [
+   "$28x^{4}$",
+   "$35x^{4}$",
+   "$5x^{4}$",
+   "$35x^{5}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 28,
+  "question": "Determinantul matricei $\\begin{pmatrix} 6 & 4 \\\\ -2 & 2 \\end{pmatrix}$ este:",
+  "answers": [
+   "$19$",
+   "$-20$",
+   "$4$",
+   "$20$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 29,
+  "question": "Determinantul matricei $\\begin{pmatrix} -6 & 2 \\\\ -3 & 1 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-12$",
+   "$0$",
+   "$1$",
+   "$-2$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 30,
+  "question": "Calculați $f'(x)$ pentru $f(x) = x^{7}$.",
+  "answers": [
+   "$7x^{6}$",
+   "$8x^{7}$",
+   "$6x^{6}$",
+   "$x^{6}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 31,
+  "question": "Cât este $\\lim_{x \\to -2} (-2x - 3)$?",
+  "answers": [
+   "$5$",
+   "$-2$",
+   "$1$",
+   "$-5$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 32,
+  "question": "Determinantul matricei $\\begin{pmatrix} 6 & -2 \\\\ 1 & 2 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-14$",
+   "$11$",
+   "$14$",
+   "$10$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 33,
+  "question": "Determinantul matricei $\\begin{pmatrix} 3 & 2 \\\\ 6 & -5 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-25$",
+   "$-27$",
+   "$-3$",
+   "$27$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 34,
+  "question": "Calculați derivata funcției $f(x) = 2x^{3} + 3x^{2} + 2x - 3$.",
+  "answers": [
+   "$7x^{2} + 6x + 2$",
+   "$6x^{3} + 6x^{2} + 2x$",
+   "$2x^{3} + 3x^{2} + 2x$",
+   "$6x^{2} + 6x + 2$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 35,
+  "question": "Calculați derivata funcției $f(x) = 5x^{5}$.",
+  "answers": [
+   "$5x^{4}$",
+   "$25x^{4}$",
+   "$25x^{5}$",
+   "$20x^{4}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 36,
+  "question": "Cât este $\\lim_{x \\to 4} (2x - 4)$?",
+  "answers": [
+   "$4$",
+   "$8$",
+   "$2$",
+   "$-2$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 37,
+  "question": "Cât este $\\lim_{x \\to 1} (x)$?",
+  "answers": [
+   "$2$",
+   "$0$",
+   "$5$",
+   "$1$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 38,
+  "question": "Calculați derivata funcției $f(x) = -5x^{3} + 5x^{2} - 3x - 2$.",
+  "answers": [
+   "$-5x^{3} + 5x^{2} - 3x$",
+   "$-14x^{2} + 10x - 3$",
+   "$-15x^{3} + 10x^{2} - 3x$",
+   "$-15x^{2} + 10x - 3$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 39,
+  "question": "Determinantul matricei $\\begin{pmatrix} -2 & 6 \\\\ 3 & 4 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-24$",
+   "$-26$",
+   "$26$",
+   "$-28$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 40,
+  "question": "Calculați derivata funcției $f(x) = 3x^{3} - 4x^{2} + 2x - 4$.",
+  "answers": [
+   "$9x^{3} - 8x^{2} + 2x$",
+   "$10x^{2} - 8x + 2$",
+   "$9x^{2} - 8x + 2$",
+   "$3x^{3} - 4x^{2} + 2x$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 41,
+  "question": "Cât este $\\lim_{x \\to 0} (-x + 2)$?",
+  "answers": [
+   "$0$",
+   "$1$",
+   "$5$",
+   "$2$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 42,
+  "question": "Cât este $\\lim_{x \\to 2} (2x - 5)$?",
+  "answers": [
+   "$-5$",
+   "$-3$",
+   "$4$",
+   "$-1$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 43,
+  "question": "Determinantul matricei $\\begin{pmatrix} -5 & -4 \\\\ -5 & -5 \\end{pmatrix}$ este:",
+  "answers": [
+   "$4$",
+   "$-5$",
+   "$45$",
+   "$5$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 44,
+  "question": "Calculați derivata funcției $f(x) = -4x^{2} + x - 3$.",
+  "answers": [
+   "$-8x + 1$",
+   "$-8x^{2} + x$",
+   "$-4x^{2} + x$",
+   "$-7x + 1$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 45,
+  "question": "Determinantul matricei $\\begin{pmatrix} 3 & 2 \\\\ 4 & 3 \\end{pmatrix}$ este:",
+  "answers": [
+   "$17$",
+   "$-1$",
+   "$3$",
+   "$1$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 46,
+  "question": "Calculați $f'(x)$ pentru $f(x) = x^{5}$.",
+  "answers": [
+   "$4x^{4}$",
+   "$5x^{4}$",
+   "$5x^{5}$",
+   "$6x^{5}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 47,
+  "question": "Cât este $\\lim_{x \\to -1} (3x + 3)$?",
+  "answers": [
+   "$-3$",
+   "$-2$",
+   "$0$",
+   "$6$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 48,
+  "question": "Cât este $\\lim_{x \\to -1} (-x)$?",
+  "answers": [
+   "$-3$",
+   "$-1$",
+   "$5$",
+   "$1$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 49,
+  "question": "Calculați $f'(x)$ pentru $f(x) = x^{2}$.",
+  "answers": [
+   "$2x^{2}$",
+   "$2x$",
+   "$x$",
+   "$3x^{2}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 50,
+  "question": "Calculați derivata funcției $f(x) = 7x^{6}$.",
+  "answers": [
+   "$7x^{5}$",
+   "$6x^{5}$",
+   "$42x^{5}$",
+   "$42x^{6}$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 51,
+  "question": "Determinantul matricei $\\begin{pmatrix} 3 & 6 \\\\ -2 & 1 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-9$",
+   "$-15$",
+   "$12$",
+   "$15$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 52,
+  "question": "Cât este $\\lim_{x \\to 3} (3x + 3)$?",
+  "answers": [
+   "$10$",
+   "$13$",
+   "$12$",
+   "$9$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 53,
+  "question": "Calculați $f'(x)$ pentru $f(x) = x^{3}$.",
+  "answers": [
+   "$3x^{2}$",
+   "$2x^{2}$",
+   "$x^{2}$",
+   "$4x^{3}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 54,
+  "question": "Determinantul matricei $\\begin{pmatrix} -6 & -6 \\\\ 0 & 2 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-13$",
+   "$-10$",
+   "$-12$",
+   "$12$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 55,
+  "question": "Cât este $\\lim_{x \\to 2} (-3x + 3)$?",
+  "answers": [
+   "$-4$",
+   "$-3$",
+   "$-6$",
+   "$0$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 56,
+  "question": "Cât este $\\lim_{x \\to -3} (3x - 3)$?",
+  "answers": [
+   "$-12$",
+   "$-16$",
+   "$-9$",
+   "$0$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 57,
+  "question": "Calculați derivata funcției $f(x) = x^{2} + 5x - 6$.",
+  "answers": [
+   "$2x^{2} + 5x$",
+   "$3x + 5$",
+   "$x^{2} + 5x$",
+   "$2x + 5$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 58,
+  "question": "Cât este $\\lim_{x \\to 0} (-x - 5)$?",
+  "answers": [
+   "$0$",
+   "$-5$",
+   "$-6$",
+   "$-8$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 59,
+  "question": "Calculați derivata funcției $f(x) = 3x^{5}$.",
+  "answers": [
+   "$5x^{4}$",
+   "$15x^{4}$",
+   "$15x^{5}$",
+   "$3x^{4}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 60,
+  "question": "Calculați derivata funcției $f(x) = -x^{2} - x$.",
+  "answers": [
+   "$-2x^{2} - x$",
+   "$-x^{2} - x$",
+   "$-2x - 1$",
+   "$-x - 1$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 61,
+  "question": "Determinantul matricei $\\begin{pmatrix} 2 & -1 \\\\ -3 & 6 \\end{pmatrix}$ este:",
+  "answers": [
+   "$12$",
+   "$9$",
+   "$-9$",
+   "$7$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 62,
+  "question": "Cât este $\\lim_{x \\to 4} (4x + 3)$?",
+  "answers": [
+   "$7$",
+   "$19$",
+   "$21$",
+   "$16$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 63,
+  "question": "Calculați derivata funcției $f(x) = -3x^{3} - 3x^{2} - 3x - 1$.",
+  "answers": [
+   "$-9x^{3} - 6x^{2} - 3x$",
+   "$-9x^{2} - 6x - 3$",
+   "$-3x^{3} - 3x^{2} - 3x$",
+   "$-8x^{2} - 6x - 3$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 64,
+  "question": "Cât este $\\lim_{x \\to 2} (2x - 2)$?",
+  "answers": [
+   "$2$",
+   "$6$",
+   "$4$",
+   "$0$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 65,
+  "question": "Determinantul matricei $\\begin{pmatrix} -6 & -1 \\\\ 6 & 1 \\end{pmatrix}$ este:",
+  "answers": [
+   "$0$",
+   "$-12$",
+   "$-1$",
+   "$3$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 66,
+  "question": "Cât este $\\lim_{x \\to -3} (-4x - 5)$?",
+  "answers": [
+   "$10$",
+   "$7$",
+   "$4$",
+   "$12$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 67,
+  "question": "Determinantul matricei $\\begin{pmatrix} 3 & -2 \\\\ 6 & 6 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-30$",
+   "$30$",
+   "$27$",
+   "$6$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 68,
+  "question": "Calculați derivata funcției $f(x) = 7x^{2}$.",
+  "answers": [
+   "$7x$",
+   "$14x$",
+   "$14x^{2}$",
+   "$2x$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 69,
+  "question": "Calculați $f'(x)$ pentru $f(x) = x^{8}$.",
+  "answers": [
+   "$8x^{7}$",
+   "$x^{7}$",
+   "$9x^{8}$",
+   "$8x^{8}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 70,
+  "question": "Cât este $\\lim_{x \\to -2} (2x - 3)$?",
+  "answers": [
+   "$-3$",
+   "$-7$",
+   "$-11$",
+   "$-4$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 71,
+  "question": "Cât este $\\lim_{x \\to -2} (2x - 4)$?",
+  "answers": [
+   "$-2$",
+   "$-10$",
+   "$-8$",
+   "$-4$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 72,
+  "question": "Determinantul matricei $\\begin{pmatrix} -5 & -4 \\\\ -5 & 4 \\end{pmatrix}$ este:",
+  "answers": [
+   "$0$",
+   "$-43$",
+   "$-40$",
+   "$40$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 73,
+  "question": "Cât este $\\lim_{x \\to -3} (-3x - 3)$?",
+  "answers": [
+   "$-6$",
+   "$6$",
+   "$5$",
+   "$8$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 74,
+  "question": "Cât este $\\lim_{x \\to -1} (3x - 6)$?",
+  "answers": [
+   "$-9$",
+   "$-6$",
+   "$-3$",
+   "$-12$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 75,
+  "question": "Calculați derivata funcției $f(x) = 4x^{5}$.",
+  "answers": [
+   "$20x^{4}$",
+   "$4x^{4}$",
+   "$16x^{4}$",
+   "$5x^{4}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 76,
+  "question": "Cât este $\\lim_{x \\to 0} (3x - 4)$?",
+  "answers": [
+   "$0$",
+   "$-4$",
+   "$-6$",
+   "$-3$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 77,
+  "question": "Cât este $\\lim_{x \\to -1} (-x + 6)$?",
+  "answers": [
+   "$7$",
+   "$11$",
+   "$5$",
+   "$3$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 78,
+  "question": "Determinantul matricei $\\begin{pmatrix} 3 & -3 \\\\ 5 & -5 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-30$",
+   "$-1$",
+   "$1$",
+   "$0$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 79,
+  "question": "Determinantul matricei $\\begin{pmatrix} 4 & -3 \\\\ -4 & -3 \\end{pmatrix}$ este:",
+  "answers": [
+   "$0$",
+   "$-24$",
+   "$-25$",
+   "$24$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 80,
+  "question": "Calculați derivata funcției $f(x) = 2x^{2}$.",
+  "answers": [
+   "$4x^{2}$",
+   "$4x$",
+   "$2x$",
+   "$1$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 81,
+  "question": "Calculați derivata funcției $f(x) = -5x^{3} + x^{2} + x - 1$.",
+  "answers": [
+   "$-15x^{3} + 2x^{2} + x$",
+   "$-5x^{3} + x^{2} + x$",
+   "$-15x^{2} + 2x + 1$",
+   "$-14x^{2} + 2x + 1$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 82,
+  "question": "Calculați derivata funcției $f(x) = 7x^{3}$.",
+  "answers": [
+   "$14x^{2}$",
+   "$7x^{2}$",
+   "$21x^{3}$",
+   "$21x^{2}$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 83,
+  "question": "Calculați derivata funcției $f(x) = -5x^{3} + 3x^{2} + x - 4$.",
+  "answers": [
+   "$-15x^{3} + 6x^{2} + x$",
+   "$-5x^{3} + 3x^{2} + x$",
+   "$-14x^{2} + 6x + 1$",
+   "$-15x^{2} + 6x + 1$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 84,
+  "question": "Determinantul matricei $\\begin{pmatrix} 4 & -3 \\\\ -3 & 6 \\end{pmatrix}$ este:",
+  "answers": [
+   "$16$",
+   "$-15$",
+   "$13$",
+   "$15$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 85,
+  "question": "Determinantul matricei $\\begin{pmatrix} -6 & -2 \\\\ -1 & -3 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-16$",
+   "$16$",
+   "$13$",
+   "$20$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 86,
+  "question": "Calculați derivata funcției $f(x) = 5x^{2} + 4x + 4$.",
+  "answers": [
+   "$11x + 4$",
+   "$10x + 4$",
+   "$5x^{2} + 4x$",
+   "$10x^{2} + 4x$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 87,
+  "question": "Calculați derivata funcției $f(x) = 2x^{3} + 2x^{2} + 2x + 5$.",
+  "answers": [
+   "$6x^{3} + 4x^{2} + 2x$",
+   "$7x^{2} + 4x + 2$",
+   "$2x^{3} + 2x^{2} + 2x$",
+   "$6x^{2} + 4x + 2$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 88,
+  "question": "Calculați derivata funcției $f(x) = -x^{3} - 2x^{2} - 3x$.",
+  "answers": [
+   "$-2x^{2} - 4x - 3$",
+   "$-3x^{3} - 4x^{2} - 3x$",
+   "$-x^{3} - 2x^{2} - 3x$",
+   "$-3x^{2} - 4x - 3$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 89,
+  "question": "Calculați derivata funcției $f(x) = 5x^{3} + 2x^{2} - x - 5$.",
+  "answers": [
+   "$5x^{3} + 2x^{2} - x$",
+   "$15x^{2} + 4x - 1$",
+   "$15x^{3} + 4x^{2} - x$",
+   "$16x^{2} + 4x - 1$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 90,
+  "question": "Calculați $f'(x)$ pentru $f(x) = x^{4}$.",
+  "answers": [
+   "$3x^{3}$",
+   "$x^{3}$",
+   "$4x^{3}$",
+   "$4x^{4}$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 91,
+  "question": "Cât este $\\lim_{x \\to -1} (-x - 6)$?",
+  "answers": [
+   "$-9$",
+   "$-7$",
+   "$1$",
+   "$-5$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 92,
+  "question": "Calculați derivata funcției $f(x) = -2x^{3} + 5x^{2} + x - 5$.",
+  "answers": [
+   "$-5x^{2} + 10x + 1$",
+   "$-6x^{2} + 10x + 1$",
+   "$-2x^{3} + 5x^{2} + x$",
+   "$-6x^{3} + 10x^{2} + x$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 93,
+  "question": "Calculați derivata funcției $f(x) = 2x^{5}$.",
+  "answers": [
+   "$8x^{4}$",
+   "$10x^{4}$",
+   "$2x^{4}$",
+   "$5x^{4}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 94,
+  "question": "Determinantul matricei $\\begin{pmatrix} -1 & 3 \\\\ -2 & -3 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-9$",
+   "$9$",
+   "$8$",
+   "$-3$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 95,
+  "question": "Calculați derivata funcției $f(x) = -5x^{2} - 4x$.",
+  "answers": [
+   "$-10x - 4$",
+   "$-10x^{2} - 4x$",
+   "$-5x^{2} - 4x$",
+   "$-9x - 4$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 96,
+  "question": "Determinantul matricei $\\begin{pmatrix} 1 & -3 \\\\ -3 & -4 \\end{pmatrix}$ este:",
+  "answers": [
+   "$5$",
+   "$-13$",
+   "$-15$",
+   "$13$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 97,
+  "question": "Cât este $\\lim_{x \\to -1} (x + 2)$?",
+  "answers": [
+   "$1$",
+   "$-1$",
+   "$3$",
+   "$0$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 98,
+  "question": "Determinantul matricei $\\begin{pmatrix} -6 & -3 \\\\ 1 & 3 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-21$",
+   "$-15$",
+   "$-14$",
+   "$-18$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 99,
+  "question": "Calculați derivata funcției $f(x) = 4x^{3} + 3x^{2} + 2x + 6$.",
+  "answers": [
+   "$12x^{2} + 6x + 2$",
+   "$4x^{3} + 3x^{2} + 2x$",
+   "$12x^{3} + 6x^{2} + 2x$",
+   "$13x^{2} + 6x + 2$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 100,
+  "question": "Cât este $\\lim_{x \\to 2} (2x - 4)$?",
+  "answers": [
+   "$2$",
+   "$0$",
+   "$-4$",
+   "$-2$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 101,
+  "question": "Calculați derivata funcției $f(x) = 2x^{3}$.",
+  "answers": [
+   "$3x^{2}$",
+   "$6x^{2}$",
+   "$4x^{2}$",
+   "$2x^{2}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 102,
+  "question": "Calculați derivata funcției $f(x) = 3x^{6}$.",
+  "answers": [
+   "$18x^{6}$",
+   "$18x^{5}$",
+   "$3x^{5}$",
+   "$6x^{5}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 103,
+  "question": "Cât este $\\lim_{x \\to -1} (-x + 5)$?",
+  "answers": [
+   "$1$",
+   "$7$",
+   "$6$",
+   "$4$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 104,
+  "question": "Calculați derivata funcției $f(x) = 6x^{4}$.",
+  "answers": [
+   "$24x^{4}$",
+   "$6x^{3}$",
+   "$18x^{3}$",
+   "$24x^{3}$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 105,
+  "question": "Determinantul matricei $\\begin{pmatrix} 6 & -3 \\\\ -5 & 3 \\end{pmatrix}$ este:",
+  "answers": [
+   "$3$",
+   "$1$",
+   "$-3$",
+   "$33$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 106,
+  "question": "Determinantul matricei $\\begin{pmatrix} -3 & 3 \\\\ 2 & 2 \\end{pmatrix}$ este:",
+  "answers": [
+   "$12$",
+   "$-13$",
+   "$-12$",
+   "$0$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 107,
+  "question": "Calculați derivata funcției $f(x) = 2x^{2} - 2x$.",
+  "answers": [
+   "$4x^{2} - 2x$",
+   "$2x^{2} - 2x$",
+   "$5x - 2$",
+   "$4x - 2$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 108,
+  "question": "Cât este $\\lim_{x \\to -2} (-2x)$?",
+  "answers": [
+   "$5$",
+   "$4$",
+   "$-2$",
+   "$3$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 109,
+  "question": "Calculați derivata funcției $f(x) = 3x^{3} - 2x^{2} - 4x - 4$.",
+  "answers": [
+   "$10x^{2} - 4x - 4$",
+   "$9x^{2} - 4x - 4$",
+   "$9x^{3} - 4x^{2} - 4x$",
+   "$3x^{3} - 2x^{2} - 4x$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 110,
+  "question": "Calculați derivata funcției $f(x) = -x^{2} - 4x$.",
+  "answers": [
+   "$-x - 4$",
+   "$-2x - 4$",
+   "$-x^{2} - 4x$",
+   "$-2x^{2} - 4x$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 111,
+  "question": "Calculați derivata funcției $f(x) = 6x^{6}$.",
+  "answers": [
+   "$30x^{5}$",
+   "$36x^{6}$",
+   "$6x^{5}$",
+   "$36x^{5}$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 112,
+  "question": "Determinantul matricei $\\begin{pmatrix} 3 & -5 \\\\ 2 & 2 \\end{pmatrix}$ este:",
+  "answers": [
+   "$-16$",
+   "$16$",
+   "$18$",
+   "$15$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 113,
+  "question": "Calculați derivata funcției $f(x) = 5x^{3}$.",
+  "answers": [
+   "$3x^{2}$",
+   "$10x^{2}$",
+   "$15x^{2}$",
+   "$5x^{2}$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 114,
+  "question": "Cât este $\\lim_{x \\to 2} (3x)$?",
+  "answers": [
+   "$6$",
+   "$1$",
+   "$3$",
+   "$9$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 115,
+  "question": "Calculați derivata funcției $f(x) = 3x^{3}$.",
+  "answers": [
+   "$3x^{2}$",
+   "$9x^{3}$",
+   "$6x^{2}$",
+   "$9x^{2}$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 116,
+  "question": "Calculați derivata funcției $f(x) = -4x^{2} + x - 6$.",
+  "answers": [
+   "$-4x^{2} + x$",
+   "$-7x + 1$",
+   "$-8x + 1$",
+   "$-8x^{2} + x$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 117,
+  "question": "Calculați derivata funcției $f(x) = 5x^{2} + 5x - 2$.",
+  "answers": [
+   "$5x^{2} + 5x$",
+   "$10x + 5$",
+   "$11x + 5$",
+   "$10x^{2} + 5x$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 118,
+  "question": "Determinantul matricei $\\begin{pmatrix} -3 & -3 \\\\ 5 & -4 \\end{pmatrix}$ este:",
+  "answers": [
+   "$27$",
+   "$-27$",
+   "$29$",
+   "$26$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 119,
+  "question": "Cât este $\\lim_{x \\to -2} (-4x - 1)$?",
+  "answers": [
+   "$8$",
+   "$3$",
+   "$-5$",
+   "$7$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 120,
+  "question": "Calculați derivata funcției $f(x) = -4x^{3} + 3x^{2} + 2x - 5$.",
+  "answers": [
+   "$-12x^{2} + 6x + 2$",
+   "$-11x^{2} + 6x + 2$",
+   "$-12x^{3} + 6x^{2} + 2x$",
+   "$-4x^{3} + 3x^{2} + 2x$"
+  ],
+  "correct": 0
+ }
 ]

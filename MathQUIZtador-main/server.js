@@ -727,9 +727,9 @@ function joinRoomHelper(socket, roomCode) {
 const PLAYER_COLORS = ['#00f0ff', '#ff007f', '#ffea00'];
 const NEUTRAL = '#2d3561';
 const BATTLE_ROUNDS = 10;
-const MC_DURATION = 20000;
-const TIE_DURATION = 20000;
-const STEP_DELAY = 3800;
+const MC_DURATION = 45000;   // 45s pentru întrebările grilă (derivate etc.)
+const TIE_DURATION = 45000;  // 45s pentru departajări numerice
+const STEP_DELAY = 4200;
 
 function freeAdjacentForPlayer(gs, socketId) {
   const owned = gs.map.filter(t => t.owner === socketId).map(t => t.id);

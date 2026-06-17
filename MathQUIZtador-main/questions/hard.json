@@ -1,62 +1,772 @@
 [
-  {
-    "id": 1,
-    "question": "Calculați limita: lim (x -> 0) (e^x - 1 - x) / x².",
-    "answers": ["1/2", "1", "0", "∞"],
-    "correct": 0
-  },
-  {
-    "id": 2,
-    "question": "Sistemul cu ecuațiile x+y+z=1, x+ay+z=1, x+y+az=a este compatibil determinat dacă și numai dacă:",
-    "answers": ["a ∈ ℝ \\ {1}", "a = 1", "a ∈ ℝ \\ {0, 1}", "a = 0"],
-    "correct": 0
-  },
-  {
-    "id": 3,
-    "question": "Dacă A = [[1, 1], [0, 1]], atunci A^n pentru n ∈ ℕ* este:",
-    "answers": ["[[1, n], [0, 1]]", "[[1, 1], [0, 1]]", "[[1, n²], [0, 1]]", "[[n, n], [0, n]]"],
-    "correct": 0
-  },
-  {
-    "id": 4,
-    "question": "Funcția f(x) = {x² + ax + 1 pentru x ≤ 1; 2x + b pentru x > 1} este derivabilă pe ℝ pentru:",
-    "answers": ["a = 0, b = 0", "a = 1, b = 1", "a = 2, b = -1", "a = 0, b = 1"],
-    "correct": 0
-  },
-  {
-    "id": 5,
-    "question": "Fie matricea A = [[2, -1], [4, -2]]. Care este rangul matricei A^2026?",
-    "answers": ["0", "1", "2", "2026"],
-    "correct": 0
-  },
-  {
-    "id": 6,
-    "question": "Calculați limita: lim (x -> 0) (1 + x)^(1 / sin(x)).",
-    "answers": ["e", "1", "e²", "∞"],
-    "correct": 0
-  },
-  {
-    "id": 7,
-    "question": "Pentru ce valori reale m ecuația x³ - 3x + m = 0 are 3 rădăcini reale distincte?",
-    "answers": ["m ∈ (-2, 2)", "m ∈ (-∞, -2) ∪ (2, ∞)", "m ∈ [-2, 2]", "m ∈ ℝ"],
-    "correct": 0
-  },
-  {
-    "id": 8,
-    "question": "Fie A o matrice pătratică de ordinul 3 cu det(A) = 4. Cât este det(2A)?",
-    "answers": ["32", "8", "12", "4"],
-    "correct": 0
-  },
-  {
-    "id": 9,
-    "question": "Ecuația asimptotei oblice spre +∞ a funcției f(x) = (x² + 2x) / (x - 1) este:",
-    "answers": ["y = x + 3", "y = x + 2", "y = x", "y = x - 1"],
-    "correct": 0
-  },
-  {
-    "id": 10,
-    "question": "Care este numărul de puncte de inflexiune ale funcției f(x) = x⁴ - 6x² + 5?",
-    "answers": ["2", "0", "1", "4"],
-    "correct": 0
-  }
+ {
+  "id": 1,
+  "question": "Calculați $\\lim_{x \\to 0} \\dfrac{1 - \\cos x}{x^2}$.",
+  "answers": [
+   "$2$",
+   "$1$",
+   "$0$",
+   "$\\dfrac{1}{2}$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 2,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\left(1 + \\dfrac{1}{x}\\right)^x$.",
+  "answers": [
+   "$e$",
+   "$1$",
+   "$0$",
+   "$\\infty$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 3,
+  "question": "Calculați $\\lim_{x \\to 0} \\dfrac{\\ln(1 + x)}{x}$.",
+  "answers": [
+   "$e$",
+   "$1$",
+   "$\\infty$",
+   "$0$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 4,
+  "question": "Derivata funcției $f(x) = e^{x^2}$ este:",
+  "answers": [
+   "$2x\\,e^{x^2}$",
+   "$2x\\,e^{2x}$",
+   "$e^{x^2}$",
+   "$x^2 e^{x^2 - 1}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 5,
+  "question": "Derivata funcției $f(x) = \\arctan x$ este:",
+  "answers": [
+   "$\\dfrac{-1}{1 + x^2}$",
+   "$\\dfrac{1}{1 + x^2}$",
+   "$\\dfrac{1}{\\sqrt{1 - x^2}}$",
+   "$\\dfrac{1}{1 - x^2}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 6,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{\\ln x}{x}$.",
+  "answers": [
+   "$1$",
+   "$e$",
+   "$\\infty$",
+   "$0$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 7,
+  "question": "Derivata funcției $f(x) = x^x$ (cu $x>0$) este:",
+  "answers": [
+   "$x^x(\\ln x + 1)$",
+   "$x^x \\ln x$",
+   "$x^x$",
+   "$x \\cdot x^{x-1}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 8,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\left(\\sqrt{x^2 + x} - x\\right)$.",
+  "answers": [
+   "$\\infty$",
+   "$1$",
+   "$\\dfrac{1}{2}$",
+   "$0$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 9,
+  "question": "Derivata funcției $f(x) = e^{2x}$ este:",
+  "answers": [
+   "$2e^{2x}$",
+   "$2x e^{2x}$",
+   "$e^{2x - 1}$",
+   "$e^{2x}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 10,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{4x^{2} + 4}{x^{2}}$.",
+  "answers": [
+   "$\\infty$",
+   "$5$",
+   "$1$",
+   "$4$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 11,
+  "question": "Derivata a doua a funcției $f(x) = x^{2}$ este:",
+  "answers": [
+   "$2x$",
+   "$3$",
+   "$2$",
+   "$1$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 12,
+  "question": "Derivata funcției $f(x) = \\ln(2x)$ este:",
+  "answers": [
+   "$\\dfrac{1}{x}$",
+   "$\\dfrac{2}{x}$",
+   "$\\dfrac{1}{2x}$",
+   "$\\ln(2x)$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 13,
+  "question": "Calculați $\\begin{vmatrix} -3 & 2 & 3 \\\\ -4 & 0 & 0 \\\\ 3 & 3 & 0 \\end{vmatrix}$.",
+  "answers": [
+   "$-36$",
+   "$36$",
+   "$-38$",
+   "$-33$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 14,
+  "question": "Derivata a doua a funcției $f(x) = x^{7}$ este:",
+  "answers": [
+   "$7x^{6}$",
+   "$42x^{6}$",
+   "$42x^{5}$",
+   "$6x^{5}$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 15,
+  "question": "Calculați $\\begin{vmatrix} -4 & 2 & 1 \\\\ -4 & 4 & 4 \\\\ 1 & 3 & -1 \\end{vmatrix}$.",
+  "answers": [
+   "$45$",
+   "$48$",
+   "$51$",
+   "$0$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 16,
+  "question": "Pentru ce $x$ funcția $f(x) = x^{2} + 6x$ are derivata nulă?",
+  "answers": [
+   "$x = 3$",
+   "$x = 6$",
+   "$x = -3$",
+   "$x = -2$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 17,
+  "question": "Derivata a doua a funcției $f(x) = x^{3}$ este:",
+  "answers": [
+   "$2x$",
+   "$6x$",
+   "$3x^{2}$",
+   "$6x^{2}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 18,
+  "question": "Pentru ce $x$ funcția $f(x) = x^{2} - 2x - 5$ are derivata nulă?",
+  "answers": [
+   "$x = -2$",
+   "$x = 2$",
+   "$x = 1$",
+   "$x = -1$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 19,
+  "question": "Calculați $\\begin{vmatrix} -2 & -4 & -3 \\\\ 2 & 1 & -2 \\\\ 2 & 3 & -3 \\end{vmatrix}$.",
+  "answers": [
+   "$-26$",
+   "$-25$",
+   "$0$",
+   "$26$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 20,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{16x^{2} + 2}{4x^{2} + 1}$.",
+  "answers": [
+   "$\\infty$",
+   "$4$",
+   "$5$",
+   "$0$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 21,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{2x^{2} - 2}{2x^{2} + 3}$.",
+  "answers": [
+   "$\\infty$",
+   "$2$",
+   "$1$",
+   "$0$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 22,
+  "question": "Calculați $\\begin{vmatrix} 4 & -1 & -3 \\\\ 1 & -4 & 2 \\\\ -1 & 0 & -2 \\end{vmatrix}$.",
+  "answers": [
+   "$42$",
+   "$-44$",
+   "$44$",
+   "$47$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 23,
+  "question": "Derivata funcției $f(x) = (3x + 1)^2$ este:",
+  "answers": [
+   "$6(3x + 1)$",
+   "$3(3x+1)$",
+   "$(3x+1)^2$",
+   "$2(3x + 1)$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 24,
+  "question": "Calculați $\\begin{vmatrix} 1 & 4 & 3 \\\\ -2 & 3 & -3 \\\\ 2 & -4 & 0 \\end{vmatrix}$.",
+  "answers": [
+   "$-32$",
+   "$30$",
+   "$-30$",
+   "$0$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 25,
+  "question": "Derivata funcției $f(x) = \\sin(2x)$ este:",
+  "answers": [
+   "$\\cos(2x)$",
+   "$2\\cos(2x)$",
+   "$-2\\cos(2x)$",
+   "$2\\sin(2x)$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 26,
+  "question": "Pentru ce $x$ funcția $f(x) = 2x^{2} - 12x - 4$ are derivata nulă?",
+  "answers": [
+   "$x = 6$",
+   "$x = 3$",
+   "$x = -12$",
+   "$x = -3$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 27,
+  "question": "Calculați $\\begin{vmatrix} 1 & 1 & -1 \\\\ -1 & 1 & 4 \\\\ -2 & -2 & -1 \\end{vmatrix}$.",
+  "answers": [
+   "$-6$",
+   "$-7$",
+   "$0$",
+   "$6$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 28,
+  "question": "Derivata a doua a funcției $f(x) = x^{6}$ este:",
+  "answers": [
+   "$6x^{5}$",
+   "$30x^{4}$",
+   "$5x^{4}$",
+   "$30x^{5}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 29,
+  "question": "Calculați $\\begin{vmatrix} -4 & -3 & 2 \\\\ 2 & 3 & -3 \\\\ 1 & 0 & -4 \\end{vmatrix}$.",
+  "answers": [
+   "$26$",
+   "$27$",
+   "$0$",
+   "$-27$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 30,
+  "question": "Derivata funcției $f(x) = \\ln(4x)$ este:",
+  "answers": [
+   "$\\dfrac{4}{x}$",
+   "$\\ln(4x)$",
+   "$\\dfrac{1}{4x}$",
+   "$\\dfrac{1}{x}$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 31,
+  "question": "Pentru ce $x$ funcția $f(x) = x^{2} - 8x + 2$ are derivata nulă?",
+  "answers": [
+   "$x = 4$",
+   "$x = 8$",
+   "$x = -8$",
+   "$x = -4$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 32,
+  "question": "Derivata funcției $f(x) = (5x + 1)^2$ este:",
+  "answers": [
+   "$5(5x+1)$",
+   "$2(5x + 1)$",
+   "$10(5x + 1)$",
+   "$(5x+1)^2$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 33,
+  "question": "Calculați $\\begin{vmatrix} 4 & 3 & -1 \\\\ 2 & -4 & 2 \\\\ 2 & 1 & -1 \\end{vmatrix}$.",
+  "answers": [
+   "$0$",
+   "$15$",
+   "$-16$",
+   "$16$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 34,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{12x^{2} - 5}{4x^{2} + 5}$.",
+  "answers": [
+   "$4$",
+   "$0$",
+   "$\\infty$",
+   "$3$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 35,
+  "question": "Calculați $\\begin{vmatrix} -2 & -4 & 0 \\\\ -1 & 3 & -1 \\\\ 0 & -4 & 1 \\end{vmatrix}$.",
+  "answers": [
+   "$2$",
+   "$-2$",
+   "$-4$",
+   "$0$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 36,
+  "question": "Calculați $\\begin{vmatrix} -1 & 2 & 4 \\\\ -4 & 0 & -4 \\\\ 0 & -3 & 0 \\end{vmatrix}$.",
+  "answers": [
+   "$60$",
+   "$61$",
+   "$-60$",
+   "$58$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 37,
+  "question": "Pentru ce $x$ funcția $f(x) = x^{2} - 10x + 5$ are derivata nulă?",
+  "answers": [
+   "$x = -10$",
+   "$x = -5$",
+   "$x = 10$",
+   "$x = 5$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 38,
+  "question": "Derivata funcției $f(x) = \\ln(3x)$ este:",
+  "answers": [
+   "$\\dfrac{1}{x}$",
+   "$\\ln(3x)$",
+   "$\\dfrac{3}{x}$",
+   "$\\dfrac{1}{3x}$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 39,
+  "question": "Derivata funcției $f(x) = \\sin(5x)$ este:",
+  "answers": [
+   "$\\cos(5x)$",
+   "$5\\cos(5x)$",
+   "$-5\\cos(5x)$",
+   "$5\\sin(5x)$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 40,
+  "question": "Pentru ce $x$ funcția $f(x) = x^{2} + 2x - 4$ are derivata nulă?",
+  "answers": [
+   "$x = 1$",
+   "$x = 0$",
+   "$x = -1$",
+   "$x = -2$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 41,
+  "question": "Calculați $\\begin{vmatrix} 2 & 0 & -3 \\\\ -4 & 1 & -2 \\\\ -4 & 3 & 1 \\end{vmatrix}$.",
+  "answers": [
+   "$38$",
+   "$-38$",
+   "$0$",
+   "$37$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 42,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{9x^{2} + 3}{3x^{2} + 3}$.",
+  "answers": [
+   "$4$",
+   "$\\infty$",
+   "$0$",
+   "$3$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 43,
+  "question": "Pentru ce $x$ funcția $f(x) = 2x^{2} - 12x + 4$ are derivata nulă?",
+  "answers": [
+   "$x = 3$",
+   "$x = 6$",
+   "$x = -3$",
+   "$x = -12$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 44,
+  "question": "Pentru ce $x$ funcția $f(x) = 2x^{2} - 12x$ are derivata nulă?",
+  "answers": [
+   "$x = -3$",
+   "$x = 4$",
+   "$x = -12$",
+   "$x = 3$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 45,
+  "question": "Pentru ce $x$ funcția $f(x) = x^{2} + 6x + 2$ are derivata nulă?",
+  "answers": [
+   "$x = 6$",
+   "$x = 3$",
+   "$x = -3$",
+   "$x = -2$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 46,
+  "question": "Derivata a doua a funcției $f(x) = x^{5}$ este:",
+  "answers": [
+   "$4x^{3}$",
+   "$20x^{3}$",
+   "$5x^{4}$",
+   "$20x^{4}$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 47,
+  "question": "Calculați $\\begin{vmatrix} -4 & -1 & 4 \\\\ -3 & -1 & -4 \\\\ -1 & -2 & 0 \\end{vmatrix}$.",
+  "answers": [
+   "$0$",
+   "$-48$",
+   "$49$",
+   "$48$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 48,
+  "question": "Calculați $\\begin{vmatrix} 1 & 2 & -3 \\\\ 3 & -2 & 1 \\\\ 2 & -1 & 4 \\end{vmatrix}$.",
+  "answers": [
+   "$-31$",
+   "$-30$",
+   "$-27$",
+   "$0$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 49,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{x^{2} - 2}{x^{2} + 1}$.",
+  "answers": [
+   "$0$",
+   "$1$",
+   "$2$",
+   "$\\infty$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 50,
+  "question": "Pentru ce $x$ funcția $f(x) = 2x^{2} - 20x - 4$ are derivata nulă?",
+  "answers": [
+   "$x = 5$",
+   "$x = 10$",
+   "$x = 6$",
+   "$x = -5$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 51,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{8x^{2}}{2x^{2} + 3}$.",
+  "answers": [
+   "$5$",
+   "$4$",
+   "$0$",
+   "$\\infty$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 52,
+  "question": "Derivata funcției $f(x) = (2x + 1)^2$ este:",
+  "answers": [
+   "$2(2x + 1)$",
+   "$(2x+1)^2$",
+   "$2(2x+1)$",
+   "$4(2x + 1)$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 53,
+  "question": "Calculați $\\begin{vmatrix} -4 & 0 & -1 \\\\ 0 & 4 & 3 \\\\ -1 & 1 & 4 \\end{vmatrix}$.",
+  "answers": [
+   "$-56$",
+   "$-54$",
+   "$-58$",
+   "$0$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 54,
+  "question": "Derivata funcției $f(x) = \\cos(4x)$ este:",
+  "answers": [
+   "$-\\sin(4x)$",
+   "$4\\cos(4x)$",
+   "$4\\sin(4x)$",
+   "$-4\\sin(4x)$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 55,
+  "question": "Pentru ce $x$ funcția $f(x) = x^{2} + 5$ are derivata nulă?",
+  "answers": [
+   "$x = 1$",
+   "$2$",
+   "$x = 0$",
+   "$1$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 56,
+  "question": "Pentru ce $x$ funcția $f(x) = x^{2} + 2x + 3$ are derivata nulă?",
+  "answers": [
+   "$x = 2$",
+   "$x = -2$",
+   "$x = -1$",
+   "$x = 0$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 57,
+  "question": "Calculați $\\begin{vmatrix} 0 & -3 & 4 \\\\ 3 & -4 & -1 \\\\ -4 & 4 & 0 \\end{vmatrix}$.",
+  "answers": [
+   "$-32$",
+   "$0$",
+   "$-28$",
+   "$28$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 58,
+  "question": "Calculați $\\begin{vmatrix} -3 & 4 & 3 \\\\ 1 & -3 & -2 \\\\ -1 & -4 & -1 \\end{vmatrix}$.",
+  "answers": [
+   "$0$",
+   "$6$",
+   "$7$",
+   "$2$"
+  ],
+  "correct": 1
+ },
+ {
+  "id": 59,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{5x^{2} - 4}{5x^{2} - 1}$.",
+  "answers": [
+   "$1$",
+   "$2$",
+   "$5$",
+   "$\\infty$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 60,
+  "question": "Derivata funcției $f(x) = (4x + 1)^2$ este:",
+  "answers": [
+   "$8(4x + 1)$",
+   "$2(4x + 1)$",
+   "$4(4x+1)$",
+   "$(4x+1)^2$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 61,
+  "question": "Pentru ce $x$ funcția $f(x) = x^{2} + 2x - 2$ are derivata nulă?",
+  "answers": [
+   "$x = -1$",
+   "$x = 1$",
+   "$x = 0$",
+   "$x = 2$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 62,
+  "question": "Pentru ce $x$ funcția $f(x) = 2x^{2} - 4x$ are derivata nulă?",
+  "answers": [
+   "$x = 2$",
+   "$x = -4$",
+   "$x = 1$",
+   "$x = -1$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 63,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{20x^{2} + 5}{4x^{2} - 3}$.",
+  "answers": [
+   "$\\infty$",
+   "$4$",
+   "$5$",
+   "$6$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 64,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{16x^{2} - 2}{4x^{2} - 2}$.",
+  "answers": [
+   "$5$",
+   "$\\infty$",
+   "$4$",
+   "$0$"
+  ],
+  "correct": 2
+ },
+ {
+  "id": 65,
+  "question": "Derivata funcției $f(x) = \\cos(2x)$ este:",
+  "answers": [
+   "$-2\\sin(2x)$",
+   "$-\\sin(2x)$",
+   "$2\\sin(2x)$",
+   "$2\\cos(2x)$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 66,
+  "question": "Pentru ce $x$ funcția $f(x) = 2x^{2} - 4x - 1$ are derivata nulă?",
+  "answers": [
+   "$x = 1$",
+   "$x = -4$",
+   "$x = 2$",
+   "$x = -1$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 67,
+  "question": "Calculați $\\begin{vmatrix} 3 & -1 & -4 \\\\ -4 & 3 & -1 \\\\ 0 & 4 & 2 \\end{vmatrix}$.",
+  "answers": [
+   "$0$",
+   "$-86$",
+   "$85$",
+   "$86$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 68,
+  "question": "Calculați $\\lim_{x \\to \\infty} \\dfrac{25x^{2} - 4}{5x^{2} - 1}$.",
+  "answers": [
+   "$5$",
+   "$0$",
+   "$6$",
+   "$\\infty$"
+  ],
+  "correct": 0
+ },
+ {
+  "id": 69,
+  "question": "Calculați $\\begin{vmatrix} -1 & 1 & 2 \\\\ -3 & 3 & 3 \\\\ 3 & -4 & 0 \\end{vmatrix}$.",
+  "answers": [
+   "$0$",
+   "$6$",
+   "$-3$",
+   "$3$"
+  ],
+  "correct": 3
+ },
+ {
+  "id": 70,
+  "question": "Pentru ce $x$ funcția $f(x) = x^{2} - 10x + 2$ are derivata nulă?",
+  "answers": [
+   "$x = -5$",
+   "$x = 5$",
+   "$x = 6$",
+   "$x = -10$"
+  ],
+  "correct": 1
+ }
 ]

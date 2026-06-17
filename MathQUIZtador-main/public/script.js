@@ -468,20 +468,33 @@ if (isGamePage) {
     }
   }
 
+  // Randează text + LaTeX ($...$) cu KaTeX
+  function setMath(el, str) {
+    el.textContent = str || '';
+    if (window.renderMathInElement) {
+      try {
+        renderMathInElement(el, {
+          delimiters: [{ left: '$', right: '$', display: false }],
+          throwOnError: false
+        });
+      } catch (e) {}
+    }
+  }
+
   // info: {questionText, answers, duration, timeRemaining, announce, tag}
   // opts: {participant, emitName, hasAnswered}
   function showMC(info, opts) {
     clearTimer();
     questionTag.textContent = opts.tag || 'DUEL';
     attackerAnnouncement.textContent = info.announce || '';
-    questionTextVal.textContent = info.questionText;
+    setMath(questionTextVal, info.questionText);
     numericWrap.classList.add('hidden');
     questionAnswersGrid.classList.remove('hidden');
     questionAnswersGrid.innerHTML = '';
     (info.answers || []).forEach((ans, idx) => {
       const btn = document.createElement('button');
       btn.className = 'answer-btn';
-      btn.textContent = ans;
+      setMath(btn, ans);
       if (!opts.participant || opts.hasAnswered) btn.disabled = true;
       btn.addEventListener('click', () => {
         questionAnswersGrid.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
@@ -499,7 +512,7 @@ if (isGamePage) {
     clearTimer();
     questionTag.textContent = 'DEPARTAJARE';
     attackerAnnouncement.textContent = info.announce || 'Întrebare de departajare — răspunde cu un număr!';
-    questionTextVal.textContent = info.questionText;
+    setMath(questionTextVal, info.questionText);
     questionAnswersGrid.classList.add('hidden');
     numericWrap.classList.remove('hidden');
     numericInput.value = '';

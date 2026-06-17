@@ -172,6 +172,122 @@ T.vertex = () => {
   return buildQ(q, correct, dd);
 };
 
+// ---- utilitare suplimentare ----
+function fact(n) { let r = 1; for (let i = 2; i <= n; i++) r *= i; return r; }
+function comb(n, k) { return Math.round(fact(n) / (fact(k) * fact(n - k))); }
+function aranj(n, k) { return Math.round(fact(n) / fact(n - k)); }
+function mat2(a, b, c, d) { return '\\begin{pmatrix} ' + a + ' & ' + b + ' \\\\ ' + c + ' & ' + d + ' \\end{pmatrix}'; }
+function numDistract(v) { return ['$' + (v + 1) + '$', '$' + (v - 1) + '$', '$' + (v + 2) + '$', '$' + (-v) + '$', '$' + (v + randint(2, 5)) + '$']; }
+
+// Limită polinom (continuă) într-un punct
+T.limPoly = () => {
+  const a = randint(-3, 3), p = randint(1, 4), q = randint(-5, 5), r = randint(-6, 6);
+  const val = p * a * a + q * a + r;
+  return buildQ('Calculați $\\lim_{x \\to ' + a + '} (' + polyLatex([[p, 2], [q, 1], [r, 0]]) + ')$.', '$' + val + '$', numDistract(val));
+};
+
+// Determinant 2x2 (deja există T.det2) — adăugăm transpusa, urma, scalar, sumă, produs
+T.transpose = () => {
+  const a = randint(-4, 5), b = randint(-4, 5), c = randint(-4, 5), d = randint(-4, 5);
+  const correct = '$' + mat2(a, c, b, d) + '$';
+  const dd = ['$' + mat2(d, b, c, a) + '$', '$' + mat2(b, a, d, c) + '$', '$' + mat2(a, b, c, d) + '$', '$' + mat2(c, d, a, b) + '$'];
+  return buildQ('Transpusa matricei $' + mat2(a, b, c, d) + '$ este:', correct, dd);
+};
+T.trace = () => {
+  const a = randint(-5, 6), b = randint(-5, 6), c = randint(-5, 6), d = randint(-5, 6);
+  const val = a + d;
+  return buildQ('Urma (suma de pe diagonala principală) a matricei $' + mat2(a, b, c, d) + '$ este:', '$' + val + '$', numDistract(val).concat('$' + (a + b + c + d) + '$'));
+};
+T.matScalar = () => {
+  const k = randint(2, 4), a = randint(-3, 4), b = randint(-3, 4), c = randint(-3, 4), d = randint(-3, 4);
+  const correct = '$' + mat2(k * a, k * b, k * c, k * d) + '$';
+  const dd = ['$' + mat2(k * a, b, k * c, d) + '$', '$' + mat2(a + k, b + k, c + k, d + k) + '$', '$' + mat2(k * a, k * b, k * c, k * d + 1) + '$'];
+  return buildQ('Calculați $' + k + ' \\cdot ' + mat2(a, b, c, d) + '$.', correct, dd);
+};
+T.matSum = () => {
+  const A = [randint(-4, 4), randint(-4, 4), randint(-4, 4), randint(-4, 4)];
+  const B = [randint(-4, 4), randint(-4, 4), randint(-4, 4), randint(-4, 4)];
+  const S = A.map((v, i) => v + B[i]);
+  const correct = '$' + mat2(S[0], S[1], S[2], S[3]) + '$';
+  const dd = ['$' + mat2(A[0] - B[0], A[1] - B[1], A[2] - B[2], A[3] - B[3]) + '$', '$' + mat2(S[0] + 1, S[1], S[2], S[3]) + '$', '$' + mat2(S[0], S[1], S[2] + 1, S[3] - 1) + '$'];
+  return buildQ('Calculați $' + mat2(A[0], A[1], A[2], A[3]) + ' + ' + mat2(B[0], B[1], B[2], B[3]) + '$.', correct, dd);
+};
+T.matMul = () => {
+  const a = randint(-3, 3), b = randint(-3, 3), c = randint(-3, 3), d = randint(-3, 3);
+  const e = randint(-3, 3), f = randint(-3, 3), g = randint(-3, 3), h = randint(-3, 3);
+  const p1 = a * e + b * g, p2 = a * f + b * h, p3 = c * e + d * g, p4 = c * f + d * h;
+  const correct = '$' + mat2(p1, p2, p3, p4) + '$';
+  const dd = ['$' + mat2(a * e, b * f, c * g, d * h) + '$', '$' + mat2(p1 + 1, p2, p3, p4) + '$', '$' + mat2(p4, p3, p2, p1) + '$'];
+  return buildQ('Calculați produsul $' + mat2(a, b, c, d) + mat2(e, f, g, h) + '$.', correct, dd);
+};
+
+// Logaritmi / puteri
+T.logPow = () => {
+  const base = pick([2, 3, 5, 10]), k = randint(1, 4);
+  const val = Math.pow(base, k);
+  return buildQ('Cât este $\\log_{' + base + '} ' + val + '$?', '$' + k + '$', ['$' + val + '$', '$' + base + '$', '$' + (k + 1) + '$', '$' + (k - 1) + '$']);
+};
+T.powEval = () => {
+  const base = pick([2, 3, 5]), exp = base === 2 ? randint(3, 7) : randint(2, 4);
+  const val = Math.pow(base, exp);
+  return buildQ('Cât este $' + base + '^{' + exp + '}$?', '$' + val + '$', numDistract(val).concat('$' + (base * exp) + '$'));
+};
+T.factorialQ = () => {
+  const n = randint(3, 6); const val = fact(n);
+  return buildQ('Cât este $' + n + '!$?', '$' + val + '$', numDistract(val).concat('$' + (n * n) + '$', '$' + fact(n - 1) + '$'));
+};
+
+// Combinatorică
+T.combC = () => {
+  const n = randint(4, 8), k = randint(2, n - 2); const val = comb(n, k);
+  return buildQ('Cât este $C_{' + n + '}^{' + k + '}$ (combinări)?', '$' + val + '$', numDistract(val).concat('$' + aranj(n, k) + '$'));
+};
+T.combA = () => {
+  const n = randint(4, 7), k = randint(2, 3); const val = aranj(n, k);
+  return buildQ('Cât este $A_{' + n + '}^{' + k + '}$ (aranjamente)?', '$' + val + '$', numDistract(val).concat('$' + comb(n, k) + '$'));
+};
+
+// Viète (relațiile lui Viète)
+T.viete = () => {
+  const b = randint(-7, 7), c = randint(-6, 6);
+  const askSum = Math.random() < 0.5;
+  const val = askSum ? -b : c;
+  const eq = 'x^2 ' + (b >= 0 ? '+ ' + b : '- ' + (-b)) + 'x ' + (c >= 0 ? '+ ' + c : '- ' + (-c)) + ' = 0';
+  const txt = askSum ? 'Suma rădăcinilor ecuației $' + eq + '$ este:' : 'Produsul rădăcinilor ecuației $' + eq + '$ este:';
+  return buildQ(txt, '$' + val + '$', numDistract(val).concat('$' + b + '$', '$' + (-c) + '$'));
+};
+
+// Discriminant
+T.discr = () => {
+  const a = randint(1, 3), b = randint(-5, 5), c = randint(-4, 4);
+  const val = b * b - 4 * a * c;
+  return buildQ('Discriminantul ecuației $' + polyLatex([[a, 2], [b, 1], [c, 0]]) + ' = 0$ este:', '$' + val + '$', numDistract(val));
+};
+
+// Progresie aritmetică (termen n)
+T.arith = () => {
+  const a1 = randint(-3, 5), r = randint(2, 5), n = randint(3, 8);
+  const val = a1 + (n - 1) * r;
+  return buildQ('Într-o progresie aritmetică cu $a_1 = ' + a1 + '$ și rația $r = ' + r + '$, termenul $a_{' + n + '}$ este:', '$' + val + '$', numDistract(val).concat('$' + (a1 + n * r) + '$'));
+};
+// Progresie geometrică (termen n)
+T.geom = () => {
+  const a1 = randint(1, 3), q = randint(2, 3), n = randint(2, 4);
+  const val = a1 * Math.pow(q, n - 1);
+  return buildQ('Într-o progresie geometrică cu $b_1 = ' + a1 + '$ și rația $q = ' + q + '$, termenul $b_{' + n + '}$ este:', '$' + val + '$', numDistract(val).concat('$' + (a1 * Math.pow(q, n)) + '$'));
+};
+
+// Valori trigonometrice uzuale
+T.trig = () => {
+  const data = { 0: { s: '$0$', c: '$1$' }, 30: { s: '$\\dfrac{1}{2}$', c: '$\\dfrac{\\sqrt{3}}{2}$' }, 45: { s: '$\\dfrac{\\sqrt{2}}{2}$', c: '$\\dfrac{\\sqrt{2}}{2}$' }, 60: { s: '$\\dfrac{\\sqrt{3}}{2}$', c: '$\\dfrac{1}{2}$' }, 90: { s: '$1$', c: '$0$' } };
+  const ang = pick([0, 30, 45, 60, 90]);
+  const fn = pick(['s', 'c']);
+  const correct = data[ang][fn];
+  const pool = ['$0$', '$\\dfrac{1}{2}$', '$\\dfrac{\\sqrt{2}}{2}$', '$\\dfrac{\\sqrt{3}}{2}$', '$1$'];
+  const dd = pool.filter(v => v !== correct);
+  return buildQ('Cât este $\\' + (fn === 's' ? 'sin' : 'cos') + ' ' + ang + '^\\circ$?', correct, dd);
+};
+
 // ====== Întrebări fixe (concepte) ======
 const FIXED_EASY = [
   ['Valoarea $\\ln 1$ este:', '$0$', ['$1$', '$e$', '$-1$']],
@@ -220,9 +336,23 @@ function gen(templates, fixedArr, target) {
   return out.slice(0, target).map((it, i) => ({ id: i + 1, question: it.question, answers: it.answers, correct: it.correct }));
 }
 
-const easy = gen([T.monomial, T.cmonomial, T.poly, T.det2, T.limLin], FIXED_EASY, 120);
-const medium = gen([T.chain, T.limFactor, T.limInf, T.slope, T.poly, T.det2, T.cmonomial], FIXED_MED, 110);
-const hard = gen([T.second, T.det3, T.vertex, T.chain, T.limInf], FIXED_HARD, 70);
+// Pool-uri variate (derivatele sunt doar o mică parte)
+const easy = gen([
+  T.limLin, T.limPoly, T.det2, T.trace, T.transpose, T.matScalar,
+  T.powEval, T.logPow, T.factorialQ, T.combC, T.viete, T.trig,
+  T.arith, T.monomial, T.cmonomial
+], FIXED_EASY, 120);
+
+const medium = gen([
+  T.limFactor, T.limInf, T.limPoly, T.matMul, T.matSum, T.det2,
+  T.combA, T.combC, T.arith, T.geom, T.viete, T.discr, T.transpose,
+  T.chain, T.slope, T.poly
+], FIXED_MED, 110);
+
+const hard = gen([
+  T.det3, T.matMul, T.limInf, T.discr, T.geom, T.combC, T.viete,
+  T.vertex, T.second, T.chain
+], FIXED_HARD, 70);
 
 const dir = path.join(__dirname, 'questions');
 fs.writeFileSync(path.join(dir, 'easy.json'), JSON.stringify(easy, null, 1));
